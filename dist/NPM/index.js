@@ -1,13 +1,17 @@
 'use strict';
 
 const { transpileModule, ModuleKind: { ESNext } } = require('typescript');
-const Acorn_parser = require('acorn').Parser.extend(require('acorn-bigint'));
+const Parser = require('acorn').Parser.extend(require('acorn-bigint'));
 const { dirname } = require('path');
+const { stringify } = JSON;
+const { min } = Math;
 
 const AsyncFunction = async function () {}.constructor;
 const BOM = '\uFEFF';
 let ESV = 0;
 const WHITE = /^\s/;
+const BLOCK = { type: true };
+const INLINE = { type: false };
 
 exports.install = install;
 exports.version = '1.0.0';
@@ -53,10 +57,6 @@ function exports (ts, esv) {
 			extendedDiagnostics: true,
 			target: ESV ? 'ES'+ESV : 'ESNext',
 			module: ESNext,
-			//downlevelIteration: ESV<6,// default false for index<length; true for .next() .done()
-			//importHelpers: true,// default false; true for tslib
-			//experimentalDecorators: true,
-			//emitDecoratorMetadata: false,
 			newLine: 'lf',
 			emitBOM: false,
 		},
@@ -66,45 +66,61 @@ function exports (ts, esv) {
 }
 
 function padAs (es, ts) {
-	let as = '';
-	let index = 0;
-	const length = ts.length;
-	for ( const token of tokensOf(es) ) {
-		const part = es.slice(token.start, token.end);
-		while ( !ts.startsWith(part, index) ) {// top|type x = 'return throw(top:syntax-err//options) break(top:syntax-err) continue(top:syntax-err) async(runtime-err) yield(top:syntax-err) // await-options?';\n return xxx;
-			if ( index===length ) { throw Error('@ltd/j-ts interal error: TypeScript had inserted codes'); }
-			const char = ts[index];
-			as += WHITE.test(char) ? char : ' ';
-			++index;
+	let esAsTs = '';
+	let ts_index = 0;
+	const ts_length = ts.length;
+	const tokens = tokensOf(es);
+	for ( const { start, end } of tokens ) {
+		const part = es.slice(start, end);
+		while ( !ts.startsWith(part, ts_index) ) {
+			if ( ts_index===ts_length ) { throw Error('@ltd/j-ts interal error: TypeScript had inserted codes '+stringify(part)); }
+			const char = ts[ts_index];
+			esAsTs += WHITE.test(char) ? char : ' ';
+			++ts_index;
 		}
-		as += part;
-		index += part.length;
+		esAsTs += part;
+		ts_index += part.length;
 	}
-	return as;
+	compareWith(esAsTs, tokens);
+	return esAsTs;
 }
 
 function tokensOf (es) {
 	const tokens = [];
-	tokens.push(...Acorn_parser.tokenizer(es, {
+	Parser.parse(es, {
 		ecmaVersion: ESV || 2014,
 		sourceType: 'module',
-		onInsertedSemicolon (index) { throw Error('@ltd/j-ts acorn.tokenizer: onInsertedSemicolon('+index+')'); },
-		//onTrailingComma,
-		allowReserved: ESV===3 ? 'never' : true,
-		//allowReturnOutsideFunction
-		//allowImportExportEverywhere
-		//allowAwaitOutsideFunction
-		//allowHashBang
-		//locations
-		//onToken: tokens,
-		onComment (block, text, start, end) { tokens.push({ start, end }); },
-		//ranges
-		//program
-		//sourceFile
-		//directSourceFile
-		//preserveParens
-	}));
-	return tokens.sort(compare);
+		onInsertedSemicolon (index) {
+			throw Error('@ltd/j-ts acorn.parse(es) onInsertedSemicolon('+index+'): '+stringify([es.slice(0, index), es.slice(index)], null, 4));
+		},
+		allowReserved: ESV===3 ? 'never' : false,
+		allowReturnOutsideFunction: true,
+		allowAwaitOutsideFunction: true,
+		allowHashBang: true,
+		onToken: tokens,
+		onComment (block, text, start, end) { tokens.push({ type: block, start, end }); },
+	});
+	return tokens;
 }
 
-function compare (a, b) { return a.start-b.start; }
+function compareWith (esAsTs, expect) {
+	const tokens = [];
+	Parser.parse(esAsTs, {
+		ecmaVersion: ESV || 2014,
+		sourceType: 'module',
+		onInsertedSemicolon (index) {
+			throw Error('@ltd/j-ts acorn.parse(esAsTs) onInsertedSemicolon('+index+'): '+stringify([esAsTs.slice(0, index), esAsTs.slice(index)], null, 4));
+		},
+		allowReserved: ESV===3 ? 'never' : false,
+		allowReturnOutsideFunction: true,
+		allowAwaitOutsideFunction: true,
+		allowHashBang: true,
+		onToken: tokens,
+		onComment (block) { tokens.push(block ? BLOCK : INLINE); },
+	});
+	const length = min(tokens.length, expect.length);
+	for ( let index = 0; index<length; ++index ) {
+		if ( tokens[index].type!==expect[index].type ) { throw Error('@ltd/j-ts'); }
+	}
+	if ( expect.length!==tokens.length ) { throw Error('@ltd/j-ts tokens.length from '+expect.length+' to '+tokens.length); }
+}

@@ -12,24 +12,24 @@ npm install @ltd/j-ts
 `input`:
 
 ```TypeScript
-	type value = string;//
-	
-	function noop (input :value) :value {
-		return input;
+	function noop (input :any) :any {
+		
+		return <any>input as any;
+		
 	}
 ```
 
 `require('@ltd/j-ts')(input)`:
 
 ```JavaScript
-	                    //
-	
-	function noop (input       )        {
-		return input;
+	function noop (input     )      {
+		
+		return      input       ;
+		
 	}
 ```
 
-`require('typescript').transpileModule(input)`:
+`require('typescript').transpileModule(input).outputText`:
 
 ```JavaScript
 function noop(input) {
