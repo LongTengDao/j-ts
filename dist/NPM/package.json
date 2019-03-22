@@ -1,0 +1,17 @@
+{
+	"name": "@ltd/j-ts",
+	"description": "TypeScript-ECMAScript transformer with pretty source mapping. Belong to \"Plan J\".／源映射良好的 TypeScript-ECMAScript 转换工具。从属于“简计划”。",
+	"version": "1.0.0",
+	"license": "LGPL-3.0",
+	"author": "龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)",
+	"bugs": "https://GitHub.com/LongTengDao/j-ts/issues",
+	"repository": {
+		"type": "git",
+		"url": "https://GitHub.com/LongTengDao/j-ts.git"
+	},
+	"dependencies": {
+		"acorn": "6.1.1",
+		"acorn-bigint": "0.3.1",
+		"typescript": "3.3.3"
+	}
+}
