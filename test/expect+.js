@@ -20,6 +20,6 @@ var ENUM={zero:0,diy:9,two:2,three:3};
 
 
 
-import { value        } from 'MODULE';
-
-export { value        } from 'MODULE';
+                               
+import { value        } from '.ts';
+export { value        } from '.ts';

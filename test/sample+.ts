@@ -20,6 +20,6 @@ enum ENUM {
 	three,
 }
 
-import { value , type } from 'MODULE';
-
-export { value , type } from 'MODULE';
+import * as types from '.d.ts';
+import { value , type } from '.ts';
+export { value , type } from '.ts';

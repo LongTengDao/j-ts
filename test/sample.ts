@@ -45,7 +45,4 @@ interface INTERFACE { }
 
 namespace NAMESPACE { }
 
-declare module 'MODULE' {
-	export var value;
-	export type type = any;
-}
+declare module 'MODULE' { }
