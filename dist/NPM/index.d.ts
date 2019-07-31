@@ -1,11 +1,11 @@
 export = exports;
-type exports = Readonly<typeof transpileModule & {
+declare const exports :Readonly<typeof transpileModule & {
 	
-	default :exports,
+	default :typeof exports,
 	
 	transpileModule :typeof transpileModule,
 	
-	version :'3.0.1',
+	version :'3.0.2',
 	
 }>;
 declare function transpileModule (ts :string, esv? :3 | 5) :{ outputText :string };

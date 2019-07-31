@@ -1,7 +1,7 @@
 export = exports;
-type exports = Readonly<typeof transpileModule & {
+declare const exports :Readonly<typeof transpileModule & {
 	
-	default :exports,
+	default :typeof exports,
 	
 	transpileModule :typeof transpileModule,
 	
