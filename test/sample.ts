@@ -26,7 +26,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 }
 
 function FUNCTION < T extends any, U = any > ( arg1 , arg2 : any , arg3 ? ) : void;
-function FUNCTION < T extends any, U = any > ( arg1 , arg2 : any , arg3 = 1 ) : void { }
+function FUNCTION < T extends any, U = any > ( arg1 , arg2 : any , arg3 = null ) : void { }
 
 ( arg1 : 1 = 1 , arg2 ? : 2 ) => { };
 
@@ -45,4 +45,4 @@ interface INTERFACE { }
 
 namespace NAMESPACE { }
 
-declare module 'MODULE' { }
+module MODULE { }

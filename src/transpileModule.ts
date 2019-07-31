@@ -72,38 +72,40 @@ const removeFirstGT = (exp :string) :string => exp.replace(GT, ' ');
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
 
-function afterColon (kind :number) :boolean {
-	switch ( kind ) {
+function afterColon (node :Node) :boolean {
+	switch ( node.kind ) {
+		case IndexedAccessType:
 		case IntersectionType:
-		case TypeReference:
+		case ConditionalType:
+		case FunctionType:
 		case LiteralType:
 		case UnionType:
 		case TupleType:
-		case StringKeyword:
-		case NumberKeyword:
-		case SymbolKeyword:
-		case BooleanKeyword:
-		case FunctionType:
-		case TypeLiteral:
-		case NullKeyword:
-		case NeverKeyword:
-		case AnyKeyword:
-		case ObjectKeyword:
-		case TypeOperator:
-		case BigIntKeyword:
-		case UndefinedKeyword:
-		case VoidKeyword:
 		case ArrayType:
+		
 		case FirstTypeNode:
-		case ConditionalType:
-		case UnknownKeyword:
-		case IndexedAccessType:
+		
+		case TypeReference:
+		case TypeOperator:
+		case TypeLiteral:
 		case TypeQuery:
-		case EnumDeclaration:
+		
+		case VoidKeyword:
+		case UndefinedKeyword:
+		case BooleanKeyword:
+		case NumberKeyword:
+		case StringKeyword:
+		case SymbolKeyword:
+		case BigIntKeyword:
+		case ObjectKeyword:
+		case AnyKeyword:
+		case NeverKeyword:
+		case UnknownKeyword:
 			return true;
-		default:
-			return false;
+		case NullKeyword:
+			return ts.endsWith(':', node.end);
 	}
+	return false;
 }
 
 let ts :string = '';
@@ -290,7 +292,7 @@ function from (node :Node) :string {
 						gt = true;
 					}
 				}
-				else if ( afterColon(child.kind) ) {
+				else if ( afterColon(child) ) {
 					if ( gt ) {
 						gt = false;
 						es.push(removeFirstGT(ts.slice(ts_index, child.pos-1))+' ');
@@ -313,7 +315,7 @@ function from (node :Node) :string {
 		case VariableDeclaration:
 			forEachChild(node, function (child :Node) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
-				else if ( afterColon(child.kind) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
+				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else { es.push(ts.slice(ts_index, child.pos)+from(child)); }
 				ts_index = child.end;
 			});
@@ -323,7 +325,7 @@ function from (node :Node) :string {
 			let declaration = true;
 			forEachChild(node, function (child :Node) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
-				else if ( afterColon(child.kind) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
+				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else {
 					if ( declaration && ts[child.pos-1]==='=' ) { declaration = false; }
 					es.push(ts.slice(ts_index, child.pos)+from(child));
@@ -335,7 +337,7 @@ function from (node :Node) :string {
 			break;
 		case Parameter:
 			forEachChild(node, function (child :Node) {
-				if ( afterColon(child.kind) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
+				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else if ( child.kind===QuestionToken ) { es.push(ts.slice(ts_index, child.end-1)+' '); }
 				else {
 					if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }

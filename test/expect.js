@@ -26,7 +26,7 @@ class CLASS                            extends Map                              
 }
 
                                                                                    
-function FUNCTION                            ( arg1 , arg2       , arg3 = 1 )        { }
+function FUNCTION                            ( arg1 , arg2       , arg3 = null )        { }
 
 ( arg1     = 1 , arg2       ) => { };
 
@@ -45,4 +45,4 @@ var VAR1 ,
 
                        
 
-                           
+                 
