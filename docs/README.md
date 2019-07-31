@@ -9,7 +9,7 @@ npm install @ltd/j-ts
 `@ltd/j-ts` vs `typescript`
 ---------------------------
 
-`input`:
+### `input.ts`
 
 ```TypeScript
 	function noop (input :any) :any {
@@ -19,7 +19,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-`require('@ltd/j-ts')(input)`:
+### `require('@ltd/j-ts')(input :string, es? :3 | 5).outputText`
 
 ```JavaScript
 	function noop (input     )      {
@@ -29,11 +29,12 @@ npm install @ltd/j-ts
 	}
 ```
 
-`require('typescript').transpileModule(input).outputText`:
+### `require('typescript').transpileModule(input :string, options?).outputText`
 
 ```JavaScript
 function noop(input) {
     return input;
 }
 
+//# sourceMappingURL=...
 ```
