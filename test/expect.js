@@ -39,6 +39,8 @@ var VAR1 ,
 	VAR3 = 1 ,
 	VAR4       = 1 ;
 
+var IMPORT            ;
+
                     
 
                        

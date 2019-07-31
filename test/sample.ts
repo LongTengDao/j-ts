@@ -39,6 +39,8 @@ var VAR1 ,
 	VAR3 = 1 ,
 	VAR4 : any = 1 ;
 
+var IMPORT :import('');
+
 type TYPE = string ;
 
 interface INTERFACE { }

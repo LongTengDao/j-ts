@@ -60,6 +60,7 @@ const {
 		TypeQuery,
 		ModuleDeclaration,
 		MappedType,
+		LastTypeNode,
 	},
 	forEachChild,
 } = require('typescript');
@@ -86,6 +87,7 @@ function afterColon (node :Node) :boolean {
 		case ArrayType:
 		
 		case FirstTypeNode:
+		case LastTypeNode:
 		
 		case TypeReference:
 		case TypeOperator:

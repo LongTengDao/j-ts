@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '3.0.4';
+const version = '3.0.5';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -70,6 +70,7 @@ const {
 		TypeQuery,
 		ModuleDeclaration,
 		MappedType,
+		LastTypeNode,
 	},
 	forEachChild,
 } = require('typescript');
@@ -96,6 +97,7 @@ function afterColon (node      )          {
 		case ArrayType:
 		
 		case FirstTypeNode:
+		case LastTypeNode:
 		
 		case TypeReference:
 		case TypeOperator:
