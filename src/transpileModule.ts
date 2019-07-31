@@ -103,7 +103,7 @@ function afterColon (node :Node) :boolean {
 		case UnknownKeyword:
 			return true;
 		case NullKeyword:
-			return ts.endsWith(':', node.end);
+			return ts.endsWith(':', node.pos);
 	}
 	return false;
 }

@@ -25,12 +25,12 @@ class CLASS                            extends Map                              
 	
 }
 
-                                                                                   
-function FUNCTION                            ( arg1 , arg2       , arg3 = null )        { }
+                                                                                    
+function FUNCTION                            ( arg1 , arg2        , arg3 = null , arg4        = null )        { }
 
 ( arg1     = 1 , arg2       ) => { };
 
-FUNCTION           (       1 , 2      ) ;
+FUNCTION           (       1 , null         ) ;
 
 new globalThis   . Map           ( [ ] , );
 
