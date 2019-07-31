@@ -59,6 +59,7 @@ const {
 		IndexedAccessType,
 		TypeQuery,
 		ModuleDeclaration,
+		MappedType,
 	},
 	forEachChild,
 } = require('typescript');
@@ -79,6 +80,7 @@ function afterColon (node :Node) :boolean {
 		case ConditionalType:
 		case FunctionType:
 		case LiteralType:
+		case MappedType:
 		case UnionType:
 		case TupleType:
 		case ArrayType:

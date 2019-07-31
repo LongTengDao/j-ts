@@ -28,7 +28,7 @@ class CLASS                            extends Map                              
                                                                                     
 function FUNCTION                            ( arg1 , arg2        , arg3 = null , arg4        = null )        { }
 
-( arg1     = 1 , arg2       ) => { };
+( arg1     = 1 , arg2       )                        => ({k:1});
 
 FUNCTION           (       1 , null         ) ;
 

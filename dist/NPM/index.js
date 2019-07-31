@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '3.0.3';
+const version = '3.0.4';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -69,6 +69,7 @@ const {
 		IndexedAccessType,
 		TypeQuery,
 		ModuleDeclaration,
+		MappedType,
 	},
 	forEachChild,
 } = require('typescript');
@@ -89,6 +90,7 @@ function afterColon (node      )          {
 		case ConditionalType:
 		case FunctionType:
 		case LiteralType:
+		case MappedType:
 		case UnionType:
 		case TupleType:
 		case ArrayType:

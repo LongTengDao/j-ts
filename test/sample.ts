@@ -28,7 +28,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 function FUNCTION < T extends any, U = any > ( arg1 , arg2 : null , arg3 ? ) : void;
 function FUNCTION < T extends any, U = any > ( arg1 , arg2 : null , arg3 = null , arg4 : null = null ) : void { }
 
-( arg1 : 1 = 1 , arg2 ? : 2 ) => { };
+( arg1 : 1 = 1 , arg2 ? : 2 ) : { [ k in 'k' ] : 1 } => ({k:1});
 
 FUNCTION < 1 , 2 > ( < 1 > 1 , null as null ) ;
 
