@@ -13,7 +13,7 @@ function * YIELD ( ) {
 		1;
 }
 
-enum ENUM {
+export enum ENUM {
 	zero ,
 	diy = 9 ,
 	two = 2 ,

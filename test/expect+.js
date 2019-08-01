@@ -13,7 +13,7 @@ function * YIELD ( ) {
 		1;
 }
 
-var ENUM={zero:0,diy:9,two:2,three:3};
+export var ENUM={zero:0,diy:9,two:2,three:3};
 
 
 
