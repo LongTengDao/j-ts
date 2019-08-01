@@ -2,14 +2,13 @@
 
 const typescript = '3.5.2';
 
-if ( require('typescript/package.json').version!==typescript ) { throw Error('typescript version'); }
-
-const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=\t)\w+/g));
-
-const index = /^\d+$/;
+const { version } = require('typescript/package.json');
+if ( version!==typescript ) { throw Error(`TypeScript version: ${version}`); }
 
 const { SyntaxKind } = require('typescript');
+const index = /^\d+$/;
 
+const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=\t)\w+/g));
 const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
 	if ( index.test(kind) ) { return false; }
 	if ( known.has(kind) ) {
@@ -20,7 +19,6 @@ const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
 });
 
 if ( known.size ) { throw Error(`TypeScript.SyncKind known:\n${[ ...known ].join('\n')}`); }
-
 if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind unknown:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}`).join('')}`); }
 
 require('../test/test.js')(async ({ build, 龙腾道, get }) => {
