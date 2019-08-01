@@ -12,11 +12,11 @@ class CLASS                            extends Map                              
 	                        
 	static [ 'method' ] ( )        { }
 	
-	                
+	'property1'    ;
 	property2     = 2;
 	[ 'property3' ] = 3;
 	
-	                       
+	static 'property1'    ;
 	static property2     = 2;
 	static [ 'property3' ] = 3;
 	

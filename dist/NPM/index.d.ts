@@ -5,7 +5,7 @@ declare const exports :Readonly<typeof transpileModule & {
 	
 	transpileModule :typeof transpileModule,
 	
-	version :'3.0.5',
+	version :'3.0.6',
 	
 }>;
 declare function transpileModule (ts :string, esv? :3 | 5) :{ outputText :string };

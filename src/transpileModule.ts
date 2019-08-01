@@ -257,13 +257,12 @@ function from (node :Node) :string {
 			}
 			break;
 		case FunctionDeclaration:
-		case MethodDeclaration: {
+		case MethodDeclaration:
 			let declaration = true;
 			forEachChild(node, function (child :Node) {
 				if ( declaration && child.kind===Block ) { declaration = false; }
 			});
 			if ( declaration ) { return remove(ts.slice(node.pos, node.end)); }
-		}
 		case FunctionExpression:
 		case GetAccessor:
 		case SetAccessor:
@@ -317,6 +316,7 @@ function from (node :Node) :string {
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 		case VariableDeclaration:
+		case PropertyDeclaration:
 			forEachChild(node, function (child :Node) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
 				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
@@ -324,20 +324,6 @@ function from (node :Node) :string {
 				ts_index = child.end;
 			});
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
-			break;
-		case PropertyDeclaration:
-			let declaration = true;
-			forEachChild(node, function (child :Node) {
-				if ( ts_index===child.pos ) { es.push(from(child)); }
-				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
-				else {
-					if ( declaration && ts[child.pos-1]==='=' ) { declaration = false; }
-					es.push(ts.slice(ts_index, child.pos)+from(child));
-				}
-				ts_index = child.end;
-			});
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
-			if ( declaration ) { return remove(ts.slice(node.pos, node.end)); }
 			break;
 		case Parameter:
 			forEachChild(node, function (child :Node) {
