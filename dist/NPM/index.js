@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '3.0.6';
+const version = '3.0.7';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -71,6 +71,7 @@ const {
 		ModuleDeclaration,
 		MappedType,
 		LastTypeNode,
+		ReadonlyKeyword,
 	},
 	forEachChild,
 } = require('typescript');
@@ -151,6 +152,7 @@ function from (node      )         {
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
+		case ReadonlyKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');

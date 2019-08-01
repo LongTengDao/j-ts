@@ -61,6 +61,7 @@ const {
 		ModuleDeclaration,
 		MappedType,
 		LastTypeNode,
+		ReadonlyKeyword,
 	},
 	forEachChild,
 } = require('typescript');
@@ -142,6 +143,7 @@ function from (node :Node) :string {
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
+		case ReadonlyKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');

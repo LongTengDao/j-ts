@@ -53,6 +53,7 @@
    	ModuleDeclaration
    	MappedType
    	LastTypeNode
+   	ReadonlyKeyword
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -180,7 +181,6 @@
 130	KeyOfKeyword
 131	ModuleKeyword
 132	NamespaceKeyword
-134	ReadonlyKeyword
 135	RequireKeyword
 138	SetKeyword
 141	TypeKeyword

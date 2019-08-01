@@ -16,6 +16,8 @@ class CLASS                            extends Map                              
 	property2     = 2;
 	[ 'property3' ] = 3;
 	
+	         property;
+	
 	static 'property1'    ;
 	static property2     = 2;
 	static [ 'property3' ] = 3;

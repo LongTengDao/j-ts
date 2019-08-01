@@ -16,6 +16,8 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	property2 : 2 = 2;
 	[ 'property3' ] = 3;
 	
+	readonly property;
+	
 	static 'property1' : 1;
 	static property2 : 2 = 2;
 	static [ 'property3' ] = 3;
