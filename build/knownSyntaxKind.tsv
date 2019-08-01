@@ -170,7 +170,7 @@
 117	StaticKeyword
 118	YieldKeyword
 119	AbstractKeyword
-   	FirstContextualKeyword
+   	FirstContextualKeyword // internal
 120	AsKeyword
 122	AsyncKeyword
 123	AwaitKeyword
@@ -188,7 +188,7 @@
 145	FromKeyword
 146	GlobalKeyword
 148	OfKeyword
-   	LastContextualKeyword
+   	LastContextualKeyword // internal
 149	QualifiedName
 150	ComputedPropertyName
 153	Decorator

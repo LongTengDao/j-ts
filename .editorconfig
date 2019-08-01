@@ -1,11 +1,14 @@
 # http://editorconfig.org
 
-[*.js]
+[docs/*]
+trim_trailing_whitespace = false
+
+[test/sample*.ts]
 charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-[*.ts]
+[test/expect*.js]
 charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = false
