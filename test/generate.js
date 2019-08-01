@@ -6,7 +6,7 @@ require('@ltd/j-dev')(__dirname)(async ({ map }) => {
 	
 	await map(
 		'sample.ts',
-		ts => transpileModule(ts).outputText,
+		transpileModule,
 		'expect.js',
 	);
 	

@@ -11,7 +11,7 @@ module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import
 		ES: 6,
 	});
 	const input = await get('test/sample.ts');
-	const { outputText } = transpileModule(input);
+	const outputText = transpileModule(input);
 	if ( outputText!==await get('test/expect.js') ) {
 		console.info(outputText);
 		console.info(JSON.stringify(

@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '3.0.8';
+const version = '4.0.0';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -125,24 +125,36 @@ function afterColon (node      )          {
 
 let ts         = '';
 
-function transpileModule (input        , esv        )                         {
+                                                                             
+                                                                                                                                                                                      
+function transpileModule (input        , esv                                                                                                 )                                           {
+	ts = input;
 	try {
-		return {
-			outputText:
-				from(
-					createSourceFile(
-						'',
-						ts = input,
-						esv
-							? esv===3 ? ES3
-							: esv===5 ? ES5
-								: throwRangeError('@ltd/j-ts(,esv)')
-							: Latest,
-						false,
-						TS,
-					)
-				)
-		};
+		return typeof esv==='object'
+			? {
+				outputText: from(createSourceFile(
+					'',
+					ts,
+					esv && esv.compilerOptions && esv.compilerOptions.target!==undefined$1
+						? esv.compilerOptions.target===ES3 ? ES3
+						: esv.compilerOptions.target===ES5 ? ES5
+							: throwRangeError('@ltd/j-ts(,esv)')
+						: Latest,
+					false,
+					TS,
+				))
+			}
+			: from(createSourceFile(
+				'',
+				ts,
+				esv
+					? esv===3 ? ES3
+					: esv===5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv)')
+					: Latest,
+				false,
+				TS,
+			));
 	}
 	finally { ts = ''; }
 }

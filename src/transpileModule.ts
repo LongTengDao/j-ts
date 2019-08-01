@@ -115,24 +115,36 @@ function afterColon (node :Node) :boolean {
 
 let ts :string = '';
 
-export default function transpileModule (input :string, esv? :3 | 5) :{ outputText :string } {
+export default function transpileModule (input :string, esv? :3 | 5) :string;
+export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :object & { outputText :string };
+export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :string | object & { outputText :string } {
+	ts = input;
 	try {
-		return {
-			outputText:
-				from(
-					createSourceFile(
-						'',
-						ts = input,
-						esv
-							? esv===3 ? ES3
-							: esv===5 ? ES5
-								: throwRangeError('@ltd/j-ts(,esv)')
-							: Latest,
-						false,
-						TS,
-					)
-				)
-		};
+		return typeof esv==='object'
+			? {
+				outputText: from(createSourceFile(
+					'',
+					ts,
+					esv && esv.compilerOptions && esv.compilerOptions.target!==undefined
+						? esv.compilerOptions.target===ES3 ? ES3
+						: esv.compilerOptions.target===ES5 ? ES5
+							: throwRangeError('@ltd/j-ts(,esv)')
+						: Latest,
+					false,
+					TS,
+				))
+			}
+			: from(createSourceFile(
+				'',
+				ts,
+				esv
+					? esv===3 ? ES3
+					: esv===5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv)')
+					: Latest,
+				false,
+				TS,
+			));
 	}
 	finally { ts = ''; }
 };

@@ -19,7 +19,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-### `require('@ltd/j-ts')(input :string, es? :3 | 5).outputText`
+### `require('@ltd/j-ts')(input :string, es? :3 | 5)`
 
 ```JavaScript
 	function noop (input     )      {

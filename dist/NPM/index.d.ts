@@ -5,7 +5,10 @@ declare const exports :Readonly<typeof transpileModule & {
 	
 	transpileModule :typeof transpileModule,
 	
-	version :'3.0.8',
+	version :'4.0.0',
 	
 }>;
-declare function transpileModule (ts :string, esv? :3 | 5) :{ outputText :string };
+
+declare function transpileModule (input :string, esv? :3 | 5) :string;
+
+declare function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :object & { outputText :string };
