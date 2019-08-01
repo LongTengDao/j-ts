@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '3.0.7';
+const version = '3.0.8';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -269,7 +269,7 @@ function from (node      )         {
 			break;
 		case FunctionDeclaration:
 		case MethodDeclaration:
-			let declaration = true;
+			let declaration          = true;
 			forEachChild(node, function (child      ) {
 				if ( declaration && child.kind===Block ) { declaration = false; }
 			});
@@ -327,7 +327,6 @@ function from (node      )         {
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 		case VariableDeclaration:
-		case PropertyDeclaration:
 			forEachChild(node, function (child      ) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
 				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
@@ -335,6 +334,26 @@ function from (node      )         {
 				ts_index = child.end;
 			});
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			break;
+		case PropertyDeclaration:
+			let question_declaration          = false;
+			forEachChild(node, function (child      ) {
+				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
+				else if ( child.kind===QuestionToken ) {
+					es.push(ts.slice(ts_index, child.end-1)+' ');
+					question_declaration = true;
+				}
+				else {
+					if ( ts_index!==child.pos ) {
+						if ( question_declaration && ts[child.pos-1]==='=' ) { question_declaration = false; }
+						es.push(ts.slice(ts_index, child.pos));
+					}
+					es.push(from(child));
+				}
+				ts_index = child.end;
+			});
+			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			if ( question_declaration ) { return remove(ts.slice(node.pos, node.end)); }
 			break;
 		case Parameter:
 			forEachChild(node, function (child      ) {

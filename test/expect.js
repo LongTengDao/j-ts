@@ -12,17 +12,19 @@ class CLASS                            extends Map                              
 	                        
 	static [ 'method' ] ( )        { }
 	
-	'property1'    ;
-	property2     = 2;
-	[ 'property3' ] = 3;
+	'property1'     ;
+	property2     = 2 ;
+	[ 'property3' ] = 3 ;
 	
-	         property;
+	         propertyA ;
+	             
+	propertyC   = 0 ;
 	
-	static 'property1'    ;
-	static property2     = 2;
-	static [ 'property3' ] = 3;
+	static 'property1'     ;
+	static property2     = 2 ;
+	static [ 'property3' ] = 3 ;
 	
-	get accessor ( )     { return 1; }
+	get accessor ( )     { return 1 ; }
 	set 'accessor' ( value     ) { }
 	
 }

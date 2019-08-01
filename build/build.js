@@ -1,10 +1,5 @@
 'use strict';
 
-const typescript = '3.5.2';
-
-const { version } = require('typescript/package.json');
-if ( version!==typescript ) { throw Error(`TypeScript version: ${version}`); }
-
 const { SyntaxKind } = require('typescript');
 const index = /^\d+$/;
 
@@ -32,7 +27,7 @@ require('../test/test.js')(async ({ build, 龙腾道, get }) => {
 				'TypeScript-ECMAScript transpiler with pretty source mapping while not using sourceMap. Belong to "Plan J".／'+
 				'不借助 sourceMap 实现源码位置映射的 TypeScript-ECMAScript 转译工具。从属于“简计划”。',
 			dependencies: {
-				typescript,
+				typescript: '3.5.2',
 			},
 		},
 		ES: 6,
