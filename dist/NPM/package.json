@@ -1,7 +1,7 @@
 {
 	"name": "@ltd/j-ts",
 	"description": "TypeScript-ECMAScript transpiler with pretty source mapping while not using sourceMap. Belong to \"Plan J\".／不借助 sourceMap 实现源码位置映射的 TypeScript-ECMAScript 转译工具。从属于“简计划”。",
-	"version": "4.0.0",
+	"version": "4.1.0",
 	"license": "LGPL-3.0",
 	"author": "龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)",
 	"bugs": "https://GitHub.com/LongTengDao/j-ts/issues",

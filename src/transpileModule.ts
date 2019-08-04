@@ -116,8 +116,8 @@ function afterColon (node :Node) :boolean {
 let ts :string = '';
 
 export default function transpileModule (input :string, esv? :3 | 5) :string;
-export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :object & { outputText :string };
-export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :string | object & { outputText :string } {
+export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string };
+export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string } {
 	ts = input;
 	try {
 		return typeof esv==='object'

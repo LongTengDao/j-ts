@@ -45,7 +45,7 @@ var VAR1 ,
 
 var IMPORT :import('');
 
-type TYPE = string ;
+type TYPE = any ;
 
 interface INTERFACE { }
 

@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.0.0';
+const version = '4.1.0';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -126,8 +126,8 @@ function afterColon (node      )          {
 let ts         = '';
 
                                                                              
-                                                                                                                                                                                      
-function transpileModule (input        , esv                                                                                                 )                                           {
+                                                                                                                                                        
+function transpileModule (input        , esv                                                                   )                                           {
 	ts = input;
 	try {
 		return typeof esv==='object'

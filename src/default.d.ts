@@ -1,14 +1,10 @@
 export = exports;
-declare const exports :Readonly<typeof transpileModule & {
-	
+declare const exports :transpileModule & Readonly<{
 	default :typeof exports,
-	
-	transpileModule :typeof transpileModule,
-	
+	transpileModule :transpileModule,
 	version :string,
-	
 }>;
-
-declare function transpileModule (input :string, esv? :3 | 5) :string;
-
-declare function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :import('typescript').ScriptTarget } }) :object & { outputText :string };
+interface transpileModule {
+	(input :string, esv? :3 | 5) :string
+	(input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string }
+}
