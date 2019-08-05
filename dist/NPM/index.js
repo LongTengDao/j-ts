@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.1.0';
+const version = '4.1.1';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -13,6 +13,7 @@ const throwRangeError = (
 const undefined$1 = void 0;
 
 const {
+	transpileModule: typescript_transpileModule,
 	createSourceFile,
 	ScriptTarget: { ES3, ES5, Latest },
 	ScriptKind: { TS },
@@ -72,6 +73,9 @@ const {
 		MappedType,
 		LastTypeNode,
 		ReadonlyKeyword,
+		PrivateKeyword,
+		ProtectedKeyword,
+		PublicKeyword,
 	},
 	forEachChild,
 } = require('typescript');
@@ -126,8 +130,8 @@ function afterColon (node      )          {
 let ts         = '';
 
                                                                              
-                                                                                                                                                        
-function transpileModule (input        , esv                                                                   )                                           {
+                                                                                                                                                                                                                  
+function transpileModule (input        , esv                                                                   )                                                                                                     {
 	ts = input;
 	try {
 		return typeof esv==='object'
@@ -135,14 +139,16 @@ function transpileModule (input        , esv                                    
 				outputText: from(createSourceFile(
 					'',
 					ts,
-					esv && esv.compilerOptions && esv.compilerOptions.target!==undefined$1
+					esv.compilerOptions && esv.compilerOptions.target!==undefined$1
 						? esv.compilerOptions.target===ES3 ? ES3
 						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv)')
+							: throwRangeError('@ltd/j-ts(,esv!)')
 						: Latest,
 					false,
 					TS,
-				))
+				)),
+				diagnostics: typescript_transpileModule(input, esv).diagnostics,
+				sourceMapText :undefined$1,
 			}
 			: from(createSourceFile(
 				'',
@@ -150,7 +156,7 @@ function transpileModule (input        , esv                                    
 				esv
 					? esv===3 ? ES3
 					: esv===5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv)')
+						: throwRangeError('@ltd/j-ts(,esv!)')
 					: Latest,
 				false,
 				TS,
@@ -158,6 +164,28 @@ function transpileModule (input        , esv                                    
 	}
 	finally { ts = ''; }
 }
+let childNodes         = [];
+function childNodes_push (child      )       { childNodes.push(child); }
+function ChildNodes (node      )         {
+	try {
+		forEachChild(node, childNodes_push);
+		return childNodes;
+	}
+	finally { childNodes = []; }
+}
+                                    
+function Children (childNodes        , ts_index        , node_end        )           {
+	const children           = [];
+	for ( let { length } = childNodes, index         = 0; index<length; ++index ) {
+		const child       = childNodes[index];
+		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
+		children.push(child);
+		ts_index = child.end;
+	}
+	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
+	return children;
+}
+
 function from (node      )         {
 	// remove import type; export type...// export var type; // import * as
 	switch ( node.kind ) {
@@ -165,57 +193,46 @@ function from (node      )         {
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
 		case ReadonlyKeyword:
+		case PrivateKeyword:
+		case ProtectedKeyword:
+		case PublicKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');
 	}
+	const childNodes         = ChildNodes(node);
+	if ( childNodes.length && childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 	let ts_index         = node.pos;
-	let firstChild                  ;
-	forEachChild(node, function (child      ) {
-		if ( !firstChild && ts_index===child.pos ) { firstChild = child; }
-	});
-	if ( firstChild && firstChild.kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 	const es           = [];
 	switch ( node.kind ) {
 		//case ReturnStatement:// return|throw|yield <>///*\n*/1; -> 0,///*\n*/1,
 		//case ThrowStatement:// (throw 1);
 		//case YieldExpression:
 		//	break;
-		case TypeAssertionExpression:
-			forEachChild(node, function (child      ) {
-				switch ( es.length ) {
-					case 0:
-						es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end)));
-						break;
-					case 1:
-						es.push(ts.slice(ts_index, child.pos-1)+' '+from(child));
-						break;
-					default:
-						throw Error(''+es.length);
-				}
-				ts_index = child.end;
-			});
-			if ( es.length!==2 ) { throw Error(''+es.length); }
+		case TypeAssertionExpression: {
+			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
+			const { pos, end }       = childNodes[0];
+			es.push(
+				ts.slice(ts_index, pos-1)+remove(ts.slice(pos-1, end))
+				+
+				ts.slice(end, childNodes[1].pos-1)+' '+from(childNodes[1])
+			);
 			break;
-		case AsExpression:
-			forEachChild(node, function (child      ) {
-				switch ( es.length ) {
-					case 0:
-						es.push(from(child));
-						break;
-					case 1:
-						es.push(ts.slice(ts_index, child.pos-2)+remove(ts.slice(child.pos-2, child.end)));
-						break;
-					default:
-						throw Error(''+es.length);
-				}
-				ts_index = child.end;
-			});
-			if ( es.length!==2 ) { throw Error(''+es.length); }
+		}
+		case AsExpression: {
+			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
+			const { pos, end }       = childNodes[1];
+			es.push(
+				from(childNodes[0])
+				+
+				ts.slice(childNodes[0].end, pos-2)+remove(ts.slice(pos-2, end))
+			);
 			break;
-		case HeritageClause:
-			let i         ;
-			forEachChild(node, function (child      ) {
+		}
+		case HeritageClause: {
+			let i          = false;
+			if ( !childNodes.length ) { throw Error(''+childNodes.length); }
+			for ( const child of childNodes ) {
 				if ( es.length ) {
 					if ( i ) {
 						es.push(remove(ts.slice(ts_index, child.end)));
@@ -244,25 +261,21 @@ function from (node      )         {
 						);
 					}
 				}
-			});
-			if ( !es.length ) { throw Error(''+es.length); }
+			}
 			break;
+		}
 		case CallExpression:
-		case NewExpression:
-			const children                      = [];
-			forEachChild(node, function (child      ) {
-				if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
-				children.push(child);
-				ts_index = child.end;
-			});
-			if ( ts_index!==node.end ) { children.push(ts.slice(ts_index, node.end)); }
-			if ( node.kind===NewExpression ) { es.push(children.shift()          ); }
-			es.push(from(children.shift()        ));
-			if ( !children.length ) { break; }
-			if ( ( children[0]           ).endsWith('<') ) {
-				es.push(( children.shift()           ).slice(0, -1)+' ');
-				while ( children.length ) {
-					const child                = children.shift() ;
+		case NewExpression: {
+			const children           = Children(childNodes, ts_index, /*ts_index = */node.end);
+			let index         = 0;
+			if ( node.kind===NewExpression ) { es.push(children[index++]          ); }
+			es.push(from(children[index++]        ));
+			const { length } = children;
+			if ( index===length ) { break; }
+			if ( ( children[index]           ).endsWith('<') ) {
+				es.push(( children[index++]           ).slice(0, -1)+' ');
+				while ( index!==length ) {
+					const child                = children[index++];
 					if ( typeof child==='string' ) {
 						if ( GT.test(child) ) {
 							es.push(removeFirstGT(child));
@@ -273,44 +286,44 @@ function from (node      )         {
 					else { es.push(remove(ts.slice(child.pos, child.end))); }
 				}
 			}
-			while ( children.length ) {
-				const child                = children.shift() ;
-				if ( typeof child==='string' ) { es.push(child); }
-				else { es.push(from(child)); }
+			while ( index!==length ) {
+				const child                = children[index++];
+				es.push(typeof child==='string' ? child : from(child));
 			}
 			break;
+		}
 		case FunctionDeclaration:
-		case MethodDeclaration:
+		case MethodDeclaration: {
 			let declaration          = true;
-			forEachChild(node, function (child      ) {
-				if ( declaration && child.kind===Block ) { declaration = false; }
-			});
+			for ( const child of childNodes ) {
+				if ( child.kind===Block ) {
+					declaration = false;
+					break;
+				}
+			}
 			if ( declaration ) { return remove(ts.slice(node.pos, node.end)); }
+		}
 		case FunctionExpression:
 		case GetAccessor:
 		case SetAccessor:
-			let notYet          = true;
-			let thisNode                  ;
-			forEachChild(node, function (child      ) {
-				if ( thisNode ) {
-					const { end }       = thisNode;
-					thisNode.end = end+ts.slice(end, child.pos).search(COMMA)+1;
-					thisNode = undefined$1;
-				}
-				if ( notYet && child.kind===Parameter ) {
-					notYet = false;
+			for ( let { length } = childNodes, index         = 0; index<length; ++index ) {
+				const child       = childNodes[index];
+				if ( child.kind===Parameter ) {
 					const maybeThis         = from(child);
 					if ( THIS.test(maybeThis) ) {
 						child.kind = TypeAliasDeclaration;
-						thisNode = child;
+						const { end }       = child;
+						const indexOfComma         = ts.slice(end, childNodes[index+1].pos).search(COMMA);
+						if ( indexOfComma>=0 ) { child.end = end+indexOfComma+1; }
 					}
+					break;
 				}
-			});
+			}
 		case ClassDeclaration:
 		case ClassExpression:
-		case ArrowFunction:
+		case ArrowFunction: {
 			let gt          = false;
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( child.kind===TypeParameter ) {
 					if ( gt ) { es.push(remove(ts.slice(ts_index, child.end))); }
 					else {
@@ -335,21 +348,22 @@ function from (node      )         {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
+		}
 		case VariableDeclaration:
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
 				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else { es.push(ts.slice(ts_index, child.pos)+from(child)); }
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
-		case PropertyDeclaration:
+		case PropertyDeclaration: {
 			let question_declaration          = false;
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else if ( child.kind===QuestionToken ) {
 					es.push(ts.slice(ts_index, child.end-1)+' ');
@@ -363,12 +377,13 @@ function from (node      )         {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			if ( question_declaration ) { return remove(ts.slice(node.pos, node.end)); }
 			break;
+		}
 		case Parameter:
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else if ( child.kind===QuestionToken ) { es.push(ts.slice(ts_index, child.end-1)+' '); }
 				else {
@@ -376,26 +391,26 @@ function from (node      )         {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 		case NonNullExpression:
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
 				es.push(from(child));
 				ts_index = child.end;
-			});
+			}
 			es.push(ts.slice(ts_index, node.end-1)+' ');
 			break;
 		case EndOfFileToken:
 			if ( node.pos!==node.end ) { es.push(ts.slice(node.pos, node.end)); }
 			break;
 		default:
-			forEachChild(node, function (child      ) {
+			for ( const child of childNodes ) {
 				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
 				es.push(from(child));
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 	}

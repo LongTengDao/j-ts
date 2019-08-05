@@ -27,6 +27,10 @@ class CLASS                            extends Map                              
 	get accessor ( )     { return 1 ; }
 	set 'accessor' ( value     ) { }
 	
+	       PUBLIC;
+	        PRIVATE;
+	          PROTECTED;
+	
 }
 
                                                                                     

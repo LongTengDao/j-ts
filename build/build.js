@@ -24,10 +24,10 @@ require('../test/test.js')(async ({ build, 龙腾道, get }) => {
 		Copy: 'LGPL-3.0',
 		NPM: {
 			description:
-				'TypeScript-ECMAScript transpiler with pretty source mapping while not using sourceMap. Belong to "Plan J".／'+
-				'不借助 sourceMap 实现源码位置映射的 TypeScript-ECMAScript 转译工具。从属于“简计划”。',
+				'Pure transpiler for TypeScript. Belong to "Plan J".／'+
+				'TypeScript 纯转译工具。从属于“简计划”。',
 			dependencies: {
-				typescript: '3.5.2',
+				typescript: '3.5.3',
 			},
 		},
 		ES: 6,

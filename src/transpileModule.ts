@@ -3,6 +3,7 @@ import throwRangeError from '.throw.RangeError';
 import undefined from '.undefined';
 
 const {
+	transpileModule: typescript_transpileModule,
 	createSourceFile,
 	ScriptTarget: { ES3, ES5, Latest },
 	ScriptKind: { TS },
@@ -62,6 +63,9 @@ const {
 		MappedType,
 		LastTypeNode,
 		ReadonlyKeyword,
+		PrivateKeyword,
+		ProtectedKeyword,
+		PublicKeyword,
 	},
 	forEachChild,
 } = require('typescript');
@@ -116,8 +120,8 @@ function afterColon (node :Node) :boolean {
 let ts :string = '';
 
 export default function transpileModule (input :string, esv? :3 | 5) :string;
-export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string };
-export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string } {
+export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
+export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
 	ts = input;
 	try {
 		return typeof esv==='object'
@@ -125,14 +129,16 @@ export default function transpileModule (input :string, esv? :3 | 5 | object & {
 				outputText: from(createSourceFile(
 					'',
 					ts,
-					esv && esv.compilerOptions && esv.compilerOptions.target!==undefined
+					esv.compilerOptions && esv.compilerOptions.target!==undefined
 						? esv.compilerOptions.target===ES3 ? ES3
 						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv)')
+							: throwRangeError('@ltd/j-ts(,esv!)')
 						: Latest,
 					false,
 					TS,
-				))
+				)),
+				diagnostics: typescript_transpileModule(input, esv).diagnostics,
+				sourceMapText :undefined,
 			}
 			: from(createSourceFile(
 				'',
@@ -140,7 +146,7 @@ export default function transpileModule (input :string, esv? :3 | 5 | object & {
 				esv
 					? esv===3 ? ES3
 					: esv===5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv)')
+						: throwRangeError('@ltd/j-ts(,esv!)')
 					: Latest,
 				false,
 				TS,
@@ -149,6 +155,28 @@ export default function transpileModule (input :string, esv? :3 | 5 | object & {
 	finally { ts = ''; }
 };
 
+let childNodes :Node[] = [];
+function childNodes_push (child :Node) :void { childNodes.push(child); }
+function ChildNodes (node :Node) :Node[] {
+	try {
+		forEachChild(node, childNodes_push);
+		return childNodes;
+	}
+	finally { childNodes = []; }
+}
+type Children = ( Node | string )[];
+function Children (childNodes :Node[], ts_index :number, node_end :number) :Children {
+	const children :Children = [];
+	for ( let { length } = childNodes, index :number = 0; index<length; ++index ) {
+		const child :Node = childNodes[index];
+		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
+		children.push(child);
+		ts_index = child.end;
+	}
+	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
+	return children;
+}
+
 function from (node :Node) :string {
 	// remove import type; export type...// export var type; // import * as
 	switch ( node.kind ) {
@@ -156,57 +184,46 @@ function from (node :Node) :string {
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
 		case ReadonlyKeyword:
+		case PrivateKeyword:
+		case ProtectedKeyword:
+		case PublicKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');
 	}
+	const childNodes :Node[] = ChildNodes(node);
+	if ( childNodes.length && childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 	let ts_index :number = node.pos;
-	let firstChild :Node | undefined;
-	forEachChild(node, function (child :Node) {
-		if ( !firstChild && ts_index===child.pos ) { firstChild = child; }
-	});
-	if ( firstChild && firstChild.kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 	const es :string[] = [];
 	switch ( node.kind ) {
 		//case ReturnStatement:// return|throw|yield <>///*\n*/1; -> 0,///*\n*/1,
 		//case ThrowStatement:// (throw 1);
 		//case YieldExpression:
 		//	break;
-		case TypeAssertionExpression:
-			forEachChild(node, function (child :Node) {
-				switch ( es.length ) {
-					case 0:
-						es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end)));
-						break;
-					case 1:
-						es.push(ts.slice(ts_index, child.pos-1)+' '+from(child));
-						break;
-					default:
-						throw Error(''+es.length);
-				}
-				ts_index = child.end;
-			});
-			if ( es.length!==2 ) { throw Error(''+es.length); }
+		case TypeAssertionExpression: {
+			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
+			const { pos, end } :Node = childNodes[0];
+			es.push(
+				ts.slice(ts_index, pos-1)+remove(ts.slice(pos-1, end))
+				+
+				ts.slice(end, childNodes[1].pos-1)+' '+from(childNodes[1])
+			);
 			break;
-		case AsExpression:
-			forEachChild(node, function (child :Node) {
-				switch ( es.length ) {
-					case 0:
-						es.push(from(child));
-						break;
-					case 1:
-						es.push(ts.slice(ts_index, child.pos-2)+remove(ts.slice(child.pos-2, child.end)));
-						break;
-					default:
-						throw Error(''+es.length);
-				}
-				ts_index = child.end;
-			});
-			if ( es.length!==2 ) { throw Error(''+es.length); }
+		}
+		case AsExpression: {
+			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
+			const { pos, end } :Node = childNodes[1];
+			es.push(
+				from(childNodes[0])
+				+
+				ts.slice(childNodes[0].end, pos-2)+remove(ts.slice(pos-2, end))
+			);
 			break;
-		case HeritageClause:
-			let i :boolean;
-			forEachChild(node, function (child :Node) {
+		}
+		case HeritageClause: {
+			let i :boolean = false;
+			if ( !childNodes.length ) { throw Error(''+childNodes.length); }
+			for ( const child of childNodes ) {
 				if ( es.length ) {
 					if ( i ) {
 						es.push(remove(ts.slice(ts_index, child.end)));
@@ -235,25 +252,21 @@ function from (node :Node) :string {
 						);
 					}
 				}
-			});
-			if ( !es.length ) { throw Error(''+es.length); }
+			}
 			break;
+		}
 		case CallExpression:
-		case NewExpression:
-			const children :( Node | string )[] = [];
-			forEachChild(node, function (child :Node) {
-				if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
-				children.push(child);
-				ts_index = child.end;
-			});
-			if ( ts_index!==node.end ) { children.push(ts.slice(ts_index, node.end)); }
-			if ( node.kind===NewExpression ) { es.push(children.shift() as string); }
-			es.push(from(children.shift() as Node));
-			if ( !children.length ) { break; }
-			if ( ( children[0] as string ).endsWith('<') ) {
-				es.push(( children.shift() as string ).slice(0, -1)+' ');
-				while ( children.length ) {
-					const child :Node | string = children.shift()!;
+		case NewExpression: {
+			const children :Children = Children(childNodes, ts_index, /*ts_index = */node.end);
+			let index :number = 0;
+			if ( node.kind===NewExpression ) { es.push(children[index++] as string); }
+			es.push(from(children[index++] as Node));
+			const { length } = children;
+			if ( index===length ) { break; }
+			if ( ( children[index] as string ).endsWith('<') ) {
+				es.push(( children[index++] as string ).slice(0, -1)+' ');
+				while ( index!==length ) {
+					const child :Node | string = children[index++];
 					if ( typeof child==='string' ) {
 						if ( GT.test(child) ) {
 							es.push(removeFirstGT(child));
@@ -264,44 +277,44 @@ function from (node :Node) :string {
 					else { es.push(remove(ts.slice(child.pos, child.end))); }
 				}
 			}
-			while ( children.length ) {
-				const child :Node | string = children.shift()!;
-				if ( typeof child==='string' ) { es.push(child); }
-				else { es.push(from(child)); }
+			while ( index!==length ) {
+				const child :Node | string = children[index++];
+				es.push(typeof child==='string' ? child : from(child));
 			}
 			break;
+		}
 		case FunctionDeclaration:
-		case MethodDeclaration:
+		case MethodDeclaration: {
 			let declaration :boolean = true;
-			forEachChild(node, function (child :Node) {
-				if ( declaration && child.kind===Block ) { declaration = false; }
-			});
+			for ( const child of childNodes ) {
+				if ( child.kind===Block ) {
+					declaration = false;
+					break;
+				}
+			}
 			if ( declaration ) { return remove(ts.slice(node.pos, node.end)); }
+		}
 		case FunctionExpression:
 		case GetAccessor:
 		case SetAccessor:
-			let notYet :boolean = true;
-			let thisNode :Node | undefined;
-			forEachChild(node, function (child :Node) {
-				if ( thisNode ) {
-					const { end } :Node = thisNode;
-					thisNode.end = end+ts.slice(end, child.pos).search(COMMA)+1;
-					thisNode = undefined;
-				}
-				if ( notYet && child.kind===Parameter ) {
-					notYet = false;
+			for ( let { length } = childNodes, index :number = 0; index<length; ++index ) {
+				const child :Node = childNodes[index];
+				if ( child.kind===Parameter ) {
 					const maybeThis :string = from(child);
 					if ( THIS.test(maybeThis) ) {
 						child.kind = TypeAliasDeclaration;
-						thisNode = child;
+						const { end } :Node = child;
+						const indexOfComma :number = ts.slice(end, childNodes[index+1].pos).search(COMMA);
+						if ( indexOfComma>=0 ) { child.end = end+indexOfComma+1; }
 					}
+					break;
 				}
-			});
+			}
 		case ClassDeclaration:
 		case ClassExpression:
-		case ArrowFunction:
+		case ArrowFunction: {
 			let gt :boolean = false;
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( child.kind===TypeParameter ) {
 					if ( gt ) { es.push(remove(ts.slice(ts_index, child.end))); }
 					else {
@@ -326,21 +339,22 @@ function from (node :Node) :string {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
+		}
 		case VariableDeclaration:
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( ts_index===child.pos ) { es.push(from(child)); }
 				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else { es.push(ts.slice(ts_index, child.pos)+from(child)); }
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
-		case PropertyDeclaration:
+		case PropertyDeclaration: {
 			let question_declaration :boolean = false;
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else if ( child.kind===QuestionToken ) {
 					es.push(ts.slice(ts_index, child.end-1)+' ');
@@ -354,12 +368,13 @@ function from (node :Node) :string {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			if ( question_declaration ) { return remove(ts.slice(node.pos, node.end)); }
 			break;
+		}
 		case Parameter:
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
 				else if ( child.kind===QuestionToken ) { es.push(ts.slice(ts_index, child.end-1)+' '); }
 				else {
@@ -367,26 +382,26 @@ function from (node :Node) :string {
 					es.push(from(child));
 				}
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 		case NonNullExpression:
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
 				es.push(from(child));
 				ts_index = child.end;
-			});
+			}
 			es.push(ts.slice(ts_index, node.end-1)+' ');
 			break;
 		case EndOfFileToken:
 			if ( node.pos!==node.end ) { es.push(ts.slice(node.pos, node.end)); }
 			break;
 		default:
-			forEachChild(node, function (child :Node) {
+			for ( const child of childNodes ) {
 				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
 				es.push(from(child));
 				ts_index = child.end;
-			});
+			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
 	}

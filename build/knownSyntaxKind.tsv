@@ -54,6 +54,9 @@
    	MappedType
    	LastTypeNode
    	ReadonlyKeyword
+   	PrivateKeyword
+   	ProtectedKeyword
+   	PublicKeyword
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -164,9 +167,6 @@
 111	InterfaceKeyword
 112	LetKeyword
 113	PackageKeyword
-114	PrivateKeyword
-115	ProtectedKeyword
-116	PublicKeyword
 117	StaticKeyword
 118	YieldKeyword
 119	AbstractKeyword

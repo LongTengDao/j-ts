@@ -27,6 +27,10 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	get accessor ( ) : 1 { return 1 ; }
 	set 'accessor' ( value : 1 ) { }
 	
+	public PUBLIC;
+	private PRIVATE;
+	protected PROTECTED;
+	
 }
 
 function FUNCTION < T extends any, U = any > ( arg1 , arg2 : null , arg3 ? ) : void;
