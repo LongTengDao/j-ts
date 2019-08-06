@@ -47,7 +47,7 @@ new globalThis ! . Map < 1 , 1 > ( [ ] , );
 var VAR1 ,
 	VAR2 : any ,
 	VAR3 = 1 ,
-	VAR4 : any = 1 ;
+	VAR4 : (1) = 1 ;
 
 var IMPORT :import('');
 declare module '' { export = a; type a = any; }

@@ -71,6 +71,7 @@ const {
 		ReturnStatement,
 		ThrowStatement,
 		YieldExpression,
+		ParenthesizedType,
 	},
 	forEachChild,
 } = require('typescript');
@@ -189,6 +190,7 @@ function Children (childNodes :Node[], ts_index :number, node_end :number) :Chil
 
 function afterColon (node :Node) :boolean {
 	switch ( node.kind ) {
+		case ParenthesizedType:
 		case IndexedAccessType:
 		case IntersectionType:
 		case ConditionalType:

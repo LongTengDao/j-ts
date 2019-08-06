@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.3.1';
+const version = '4.3.2';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -81,6 +81,7 @@ const {
 		ReturnStatement,
 		ThrowStatement,
 		YieldExpression,
+		ParenthesizedType,
 	},
 	forEachChild,
 } = require('typescript');
@@ -198,6 +199,7 @@ function Children (childNodes        , ts_index        , node_end        )      
 
 function afterColon (node      )          {
 	switch ( node.kind ) {
+		case ParenthesizedType:
 		case IndexedAccessType:
 		case IntersectionType:
 		case ConditionalType:

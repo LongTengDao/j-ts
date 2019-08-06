@@ -62,6 +62,7 @@
    	ReturnStatement
    	ThrowStatement
    	YieldExpression
+   	ParenthesizedType
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -209,7 +210,6 @@
 172	OptionalType
 173	RestType
 177	InferType
-178	ParenthesizedType
 179	ThisType
 184	ImportType
    	
