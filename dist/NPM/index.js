@@ -137,10 +137,10 @@ function transpileModule (input        , esv                                    
 }
 function coverHash (origin        )         {
 	const start         = origin.search(SHEBANG)+1;
-	for ( let index         = start; ;++index ) {
-		index = origin.indexOf('#', index);
-		if ( index<0 ) { break; }
-		hashes.push(index);
+	for ( let position         = start; ;++position ) {
+		position = origin.indexOf('#', position);
+		if ( position<0 ) { break; }
+		hashes.push(position);
 	}
 	return hashes.length ? origin.slice(0, start)+origin.slice(start).replace(HASH, '_') : origin;
 }
@@ -149,7 +149,10 @@ function recoverHash (covered        )         {
 	if ( length ) {
 		const chars           = covered.split('');
 		let index         = 0;
-		do { chars[hashes[index]] = '#'; }
+		do {
+			const position         = hashes[index];
+			if ( chars[position]==='_' ) { chars[position] = '#'; }
+		}
 		while ( ++index<length )
 		return chars.join('');
 	}
