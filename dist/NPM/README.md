@@ -12,11 +12,10 @@ npm install @ltd/j-ts
 ### `input.ts`
 
 ```TypeScript
-	function * f (v :any) :any {
-		yield <any>
-			dont_do_this;
-		return <any>
-			dont_do_this;
+	type T = any;
+	
+	function f (v :T) :T {
+		return <T> v as T;
 	}
 	
 	class C extends S {
@@ -34,11 +33,10 @@ npm install @ltd/j-ts
 ### `require('@ltd/j-ts')(input :string, es? :3 | 5)`
 
 ```JavaScript
-	function * f (v     )      {
-		yield      
-			dont_do_this;
-		return      
-			dont_do_this;
+	             
+	
+	function f (v   )    {
+		return     v     ;
 	}
 	
 	class C extends S {
@@ -57,8 +55,7 @@ npm install @ltd/j-ts
 
 ```JavaScript
 function* f(v) {
-    yield dont_do_this;
-    return dont_do_this;
+    return v;
 }
 class C extends S {
     constructor() {
@@ -75,12 +72,13 @@ C.d = 0;
 `typescript` ko `@ltd/j-ts`
 ---------------------------
 
-|                                                   | `typescript` | `@ltd/j-ts`  |               Alt             |
-|---------------------------------------------------|:------------:|:------------:|-------------------------------|
-| `yield` / `return` / `throw` + type + eol + value |      ✓      |      ✗      | - eol                         |
-| `enum $ { }`                                      |      ✓      |      ✗      | `import * as $ from './enum'` |
-| `export = $`                                      |      ✓      |      ✗      | `module.exports = $`          |
-| `import $ = require()`                            |      ✓      |      ✗      | `var $ = require()`           |
+|                                                             | `typescript` | `@ltd/j-ts`  |               Alt               |
+|-------------------------------------------------------------|:------------:|:------------:|---------------------------------|
+| `yield` / `return` / `throw` + type + eol + value           |      ✓      |      ✗      | - eol                           |
+| `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`        |
+| `export = f;`                                               |      ✓      |      ✗      | `module.exports = f;`           |
+| `import f = require('');`                                   |      ✓      |      ✗      | `var f = require('');`          |
+| `import { T } from '';`<br>`type U = T;`<br>`export { U };` |      ✓      |      ✗      | `export type U = import('').T;` |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------

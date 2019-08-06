@@ -59,6 +59,9 @@
    	PublicKeyword
    	ImportEqualsDeclaration
    	ExportAssignment
+   	ReturnStatement
+   	ThrowStatement
+   	YieldExpression
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -228,7 +231,6 @@
 205	BinaryExpression
 206	ConditionalExpression
 207	TemplateExpression
-208	YieldExpression
 209	SpreadElement
 211	OmittedExpression
 212	ExpressionWithTypeArguments
@@ -247,11 +249,9 @@
 228	ForOfStatement
 229	ContinueStatement
 230	BreakStatement
-231	ReturnStatement
 232	WithStatement
 233	SwitchStatement
 234	LabeledStatement
-235	ThrowStatement
 236	TryStatement
 237	DebuggerStatement
 239	VariableDeclarationList

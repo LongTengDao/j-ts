@@ -68,6 +68,9 @@ const {
 		PublicKeyword,
 		ExportAssignment,
 		ImportEqualsDeclaration,
+		ReturnStatement,
+		ThrowStatement,
+		YieldExpression,
 	},
 	forEachChild,
 } = require('typescript');
@@ -82,6 +85,18 @@ const SHEBANG = /(?<=^\uFEFF?#!.*)/;
 const HASH = /#/g;
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
+
+const EOL = /[\n\r\u2028\u2029]/;
+const WHITE = /(?<=^(?:\s+|\/(?:\/.*|\*.*?\*\/)))/s;
+const STRUCTURE = { [ReturnStatement]: 'return', [ThrowStatement]: 'throw', [YieldExpression]: 'yield' };
+function EOL_VALUE_test (literal :string) :boolean {
+	for ( ; ; ) {
+		const index :number = literal.search(WHITE);
+		if ( index<0 ) { return false; }
+		if ( EOL.test(literal.slice(0, index)) ) { return true; }
+		literal = literal.slice(index);
+	}
+}
 
 const hashes :number[] = [];
 let ts :string = '';
@@ -426,6 +441,29 @@ function from (node :Node) :string {
 				ts_index = child.end;
 			}
 			es.push(ts.slice(ts_index, node.end-1)+' ');
+			break;
+		case ReturnStatement:
+		case ThrowStatement:
+		case YieldExpression:
+			switch ( childNodes.length ) {
+				case 0:
+					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					break;
+				case 1:
+					const child :Node = childNodes[0];
+					if ( child.kind===TypeAssertionExpression ) {
+						const { 0: type, 1: value } :Node[] = ChildNodes(child);
+						if ( EOL.test(ts.slice(type.pos, value.pos)) ) { throw Error(`${STRUCTURE[node.kind]} <type (EOL)> value`); }
+						if ( EOL_VALUE_test(from(value)) ) { throw Error(`${STRUCTURE[node.kind]} <type> (EOL) value`); }
+					}
+					if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
+					es.push(from(child));
+					ts_index = child.end;
+					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					break;
+				default:
+					throw Error(''+childNodes.length);
+			}
 			break;
 		case EndOfFileToken:
 			if ( node.pos!==node.end ) { es.push(ts.slice(node.pos, node.end)); }
