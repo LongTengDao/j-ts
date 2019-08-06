@@ -13,10 +13,10 @@ const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
 	return true;
 });
 
-if ( known.size ) { throw Error(`TypeScript.SyncKind known:\n${[ ...known ].join('\n')}`); }
-if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind unknown:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}`).join('')}`); }
+if ( known.size ) { throw Error(`TypeScript.SyntaxKind (known) not found:\n${[ ...known ].join('\n')}`); }
+if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind (unknown) found:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}`).join('')}`); }
 
-require('../test/test.js')(async ({ build, 龙腾道, get }) => {
+require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 	await build({
 		name: 'j-ts',
 		user: 'LongTengDao@ltd',
@@ -34,4 +34,5 @@ require('../test/test.js')(async ({ build, 龙腾道, get }) => {
 		semver: await get('src/version'),
 		LICENSE_: true,
 	});
+	await map('docs/README.md', 'dist/NPM/README.md');
 });

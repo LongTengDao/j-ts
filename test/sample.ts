@@ -31,6 +31,8 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	private PRIVATE;
 	protected PROTECTED;
 	
+	#stage3 = '#'
+	
 }
 
 function FUNCTION < T extends any, U = any > ( arg1 , arg2 : null , arg3 ? ) : void;
@@ -48,6 +50,7 @@ var VAR1 ,
 	VAR4 : any = 1 ;
 
 var IMPORT :import('');
+declare module '' { export = a; type a = any; }
 
 type TYPE = any ;
 

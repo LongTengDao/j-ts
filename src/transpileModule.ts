@@ -66,6 +66,8 @@ const {
 		PrivateKeyword,
 		ProtectedKeyword,
 		PublicKeyword,
+		ExportAssignment,
+		ImportEqualsDeclaration,
 	},
 	forEachChild,
 } = require('typescript');
@@ -76,8 +78,94 @@ const remove = (exp :string) :string => exp.replace(S, ' ');
 const GT = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*)>/;
 const removeFirstGT = (exp :string) :string => exp.replace(GT, ' ');
 
+const SHEBANG = /(?<=^\uFEFF?#!.*)/;
+const HASH = /#/g;
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
+
+const hashes :number[] = [];
+let ts :string = '';
+let childNodes :Node[] = [];
+
+export default function transpileModule (input :string, esv? :3 | 5) :string;
+export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
+export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
+	try {
+		ts = coverHash(input);
+		return typeof esv==='object'
+			? {
+				outputText: recoverHash(from(createSourceFile(
+					'',
+					ts,
+					esv.compilerOptions && esv.compilerOptions.target!==undefined
+						? esv.compilerOptions.target===ES3 ? ES3
+						: esv.compilerOptions.target===ES5 ? ES5
+							: throwRangeError('@ltd/j-ts(,esv!)')
+						: Latest,
+					false,
+					TS,
+				))),
+				diagnostics: typescript_transpileModule(ts, esv).diagnostics,
+				sourceMapText: undefined,
+			}
+			: recoverHash(from(createSourceFile(
+				'',
+				ts,
+				esv
+					? esv===3 ? ES3
+					: esv===5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv!)')
+					: Latest,
+				false,
+				TS,
+			)));
+	}
+	finally {
+		hashes.length = 0;
+		ts = '';
+	}
+};
+
+function coverHash (origin :string) :string {
+	const start :number = origin.search(SHEBANG)+1;
+	for ( let index :number = start; ;++index ) {
+		index = origin.indexOf('#', index);
+		if ( index<0 ) { break; }
+		hashes.push(index);
+	}
+	return hashes.length ? origin.slice(0, start)+origin.slice(start).replace(HASH, '_') : origin;
+}
+function recoverHash (covered :string) :string {
+	const { length } = hashes;
+	if ( length ) {
+		const chars :string[] = covered.split('');
+		let index :number = 0;
+		do { chars[hashes[index]] = '#'; }
+		while ( ++index<length )
+		return chars.join('');
+	}
+	return covered;
+}
+
+function childNodes_push (child :Node) :void { childNodes.push(child); }
+function ChildNodes (node :Node) :Node[] {
+	try {
+		forEachChild(node, childNodes_push);
+		return childNodes;
+	}
+	finally { childNodes = []; }
+}
+function Children (childNodes :Node[], ts_index :number, node_end :number) :Children {
+	const children :Children = [];
+	for ( let { length } = childNodes, index :number = 0; index<length; ++index ) {
+		const child :Node = childNodes[index];
+		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
+		children.push(child);
+		ts_index = child.end;
+	}
+	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
+	return children;
+}
 
 function afterColon (node :Node) :boolean {
 	switch ( node.kind ) {
@@ -117,68 +205,7 @@ function afterColon (node :Node) :boolean {
 	return false;
 }
 
-let ts :string = '';
-
-export default function transpileModule (input :string, esv? :3 | 5) :string;
-export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
-export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
-	ts = input;
-	try {
-		return typeof esv==='object'
-			? {
-				outputText: from(createSourceFile(
-					'',
-					ts,
-					esv.compilerOptions && esv.compilerOptions.target!==undefined
-						? esv.compilerOptions.target===ES3 ? ES3
-						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv!)')
-						: Latest,
-					false,
-					TS,
-				)),
-				diagnostics: typescript_transpileModule(input, esv).diagnostics,
-				sourceMapText :undefined,
-			}
-			: from(createSourceFile(
-				'',
-				ts,
-				esv
-					? esv===3 ? ES3
-					: esv===5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv!)')
-					: Latest,
-				false,
-				TS,
-			));
-	}
-	finally { ts = ''; }
-};
-
-let childNodes :Node[] = [];
-function childNodes_push (child :Node) :void { childNodes.push(child); }
-function ChildNodes (node :Node) :Node[] {
-	try {
-		forEachChild(node, childNodes_push);
-		return childNodes;
-	}
-	finally { childNodes = []; }
-}
-type Children = ( Node | string )[];
-function Children (childNodes :Node[], ts_index :number, node_end :number) :Children {
-	const children :Children = [];
-	for ( let { length } = childNodes, index :number = 0; index<length; ++index ) {
-		const child :Node = childNodes[index];
-		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
-		children.push(child);
-		ts_index = child.end;
-	}
-	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
-	return children;
-}
-
 function from (node :Node) :string {
-	// remove import type; export type...// export var type; // import * as
 	switch ( node.kind ) {
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
@@ -190,16 +217,20 @@ function from (node :Node) :string {
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');
+		case ImportEqualsDeclaration:
+			throw Error('import $ = require()');
 	}
 	const childNodes :Node[] = ChildNodes(node);
-	if ( childNodes.length && childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
+	if ( childNodes.length ) {
+		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
+		if ( node.kind===ExportAssignment ) {
+			const { pos } :Node = childNodes[0];
+			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = $'); }
+		}
+	}
 	let ts_index :number = node.pos;
 	const es :string[] = [];
 	switch ( node.kind ) {
-		//case ReturnStatement:// return|throw|yield <>///*\n*/1; -> 0,///*\n*/1,
-		//case ThrowStatement:// (throw 1);
-		//case YieldExpression:
-		//	break;
 		case TypeAssertionExpression: {
 			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
 			const { pos, end } :Node = childNodes[0];
@@ -409,3 +440,4 @@ function from (node :Node) :string {
 }
 
 type Node = { kind :number, pos :number, end :number };
+type Children = ( Node | string )[];

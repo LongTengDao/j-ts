@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.1.1';
+const version = '4.2.0';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -76,6 +76,8 @@ const {
 		PrivateKeyword,
 		ProtectedKeyword,
 		PublicKeyword,
+		ExportAssignment,
+		ImportEqualsDeclaration,
 	},
 	forEachChild,
 } = require('typescript');
@@ -86,8 +88,93 @@ const remove = (exp        )         => exp.replace(S, ' ');
 const GT = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*)>/;
 const removeFirstGT = (exp        )         => exp.replace(GT, ' ');
 
+const SHEBANG = /(?<=^\uFEFF?#!.*)/;
+const HASH = /#/g;
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
+
+const hashes           = [];
+let ts         = '';
+let childNodes         = [];
+
+                                                                             
+                                                                                                                                                                                                                  
+function transpileModule (input        , esv                                                                   )                                                                                                     {
+	try {
+		ts = coverHash(input);
+		return typeof esv==='object'
+			? {
+				outputText: recoverHash(from(createSourceFile(
+					'',
+					ts,
+					esv.compilerOptions && esv.compilerOptions.target!==undefined$1
+						? esv.compilerOptions.target===ES3 ? ES3
+						: esv.compilerOptions.target===ES5 ? ES5
+							: throwRangeError('@ltd/j-ts(,esv!)')
+						: Latest,
+					false,
+					TS,
+				))),
+				diagnostics: typescript_transpileModule(ts, esv).diagnostics,
+				sourceMapText: undefined$1,
+			}
+			: recoverHash(from(createSourceFile(
+				'',
+				ts,
+				esv
+					? esv===3 ? ES3
+					: esv===5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv!)')
+					: Latest,
+				false,
+				TS,
+			)));
+	}
+	finally {
+		hashes.length = 0;
+		ts = '';
+	}
+}
+function coverHash (origin        )         {
+	const start         = origin.search(SHEBANG)+1;
+	for ( let index         = start; ;++index ) {
+		index = origin.indexOf('#', index);
+		if ( index<0 ) { break; }
+		hashes.push(index);
+	}
+	return hashes.length ? origin.slice(0, start)+origin.slice(start).replace(HASH, '_') : origin;
+}
+function recoverHash (covered        )         {
+	const { length } = hashes;
+	if ( length ) {
+		const chars           = covered.split('');
+		let index         = 0;
+		do { chars[hashes[index]] = '#'; }
+		while ( ++index<length )
+		return chars.join('');
+	}
+	return covered;
+}
+
+function childNodes_push (child      )       { childNodes.push(child); }
+function ChildNodes (node      )         {
+	try {
+		forEachChild(node, childNodes_push);
+		return childNodes;
+	}
+	finally { childNodes = []; }
+}
+function Children (childNodes        , ts_index        , node_end        )           {
+	const children           = [];
+	for ( let { length } = childNodes, index         = 0; index<length; ++index ) {
+		const child       = childNodes[index];
+		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
+		children.push(child);
+		ts_index = child.end;
+	}
+	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
+	return children;
+}
 
 function afterColon (node      )          {
 	switch ( node.kind ) {
@@ -127,67 +214,7 @@ function afterColon (node      )          {
 	return false;
 }
 
-let ts         = '';
-
-                                                                             
-                                                                                                                                                                                                                  
-function transpileModule (input        , esv                                                                   )                                                                                                     {
-	ts = input;
-	try {
-		return typeof esv==='object'
-			? {
-				outputText: from(createSourceFile(
-					'',
-					ts,
-					esv.compilerOptions && esv.compilerOptions.target!==undefined$1
-						? esv.compilerOptions.target===ES3 ? ES3
-						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv!)')
-						: Latest,
-					false,
-					TS,
-				)),
-				diagnostics: typescript_transpileModule(input, esv).diagnostics,
-				sourceMapText :undefined$1,
-			}
-			: from(createSourceFile(
-				'',
-				ts,
-				esv
-					? esv===3 ? ES3
-					: esv===5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv!)')
-					: Latest,
-				false,
-				TS,
-			));
-	}
-	finally { ts = ''; }
-}
-let childNodes         = [];
-function childNodes_push (child      )       { childNodes.push(child); }
-function ChildNodes (node      )         {
-	try {
-		forEachChild(node, childNodes_push);
-		return childNodes;
-	}
-	finally { childNodes = []; }
-}
-                                    
-function Children (childNodes        , ts_index        , node_end        )           {
-	const children           = [];
-	for ( let { length } = childNodes, index         = 0; index<length; ++index ) {
-		const child       = childNodes[index];
-		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
-		children.push(child);
-		ts_index = child.end;
-	}
-	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
-	return children;
-}
-
 function from (node      )         {
-	// remove import type; export type...// export var type; // import * as
 	switch ( node.kind ) {
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
@@ -199,16 +226,20 @@ function from (node      )         {
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
 			throw Error('enum');
+		case ImportEqualsDeclaration:
+			throw Error('import $ = require()');
 	}
 	const childNodes         = ChildNodes(node);
-	if ( childNodes.length && childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
+	if ( childNodes.length ) {
+		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
+		if ( node.kind===ExportAssignment ) {
+			const { pos }       = childNodes[0];
+			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = $'); }
+		}
+	}
 	let ts_index         = node.pos;
 	const es           = [];
 	switch ( node.kind ) {
-		//case ReturnStatement:// return|throw|yield <>///*\n*/1; -> 0,///*\n*/1,
-		//case ThrowStatement:// (throw 1);
-		//case YieldExpression:
-		//	break;
 		case TypeAssertionExpression: {
 			if ( childNodes.length!==2 ) { throw Error(''+childNodes.length); }
 			const { pos, end }       = childNodes[0];

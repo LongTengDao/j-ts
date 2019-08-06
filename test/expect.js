@@ -31,6 +31,8 @@ class CLASS                            extends Map                              
 	        PRIVATE;
 	          PROTECTED;
 	
+	#stage3 = '#'
+	
 }
 
                                                                                     
@@ -48,6 +50,7 @@ var VAR1 ,
 	VAR4       = 1 ;
 
 var IMPORT            ;
+                                               
 
                  
 

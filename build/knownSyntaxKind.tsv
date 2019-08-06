@@ -57,6 +57,8 @@
    	PrivateKeyword
    	ProtectedKeyword
    	PublicKeyword
+   	ImportEqualsDeclaration
+   	ExportAssignment
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -256,13 +258,11 @@
 246	ModuleBlock
 247	CaseBlock
 248	NamespaceExportDeclaration
-249	ImportEqualsDeclaration
 250	ImportDeclaration
 251	ImportClause
 252	NamespaceImport
 253	NamedImports
 254	ImportSpecifier
-255	ExportAssignment
 256	ExportDeclaration
 257	NamedExports
 258	ExportSpecifier

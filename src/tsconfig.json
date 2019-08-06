@@ -1,15 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ESNext",
-		"baseUrl": ".",
-		"paths": {
-			"typescript": [
-				"../node_modules/typescript/lib/typescript",
-				"../../node_modules/typescript/lib/typescript",
-				"../../../node_modules/typescript/lib/typescript",
-				"../../../../node_modules/typescript/lib/typescript"
-			]
-		},
+		"types": [ "node" ],
 		"strict": true,
 		"noImplicitReturns": true,
 		"noUnusedLocals": true
