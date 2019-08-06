@@ -31,7 +31,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	private PRIVATE;
 	protected PROTECTED;
 	
-	#stage3 :'#' = '#'
+	#stage3 : '#' = '#' ;
 	
 }
 

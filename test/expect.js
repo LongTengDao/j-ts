@@ -31,7 +31,7 @@ class CLASS                            extends Map                              
 	        PRIVATE;
 	          PROTECTED;
 	
-	#stage3      = '#'
+	#stage3       = '#' ;
 	
 }
 
