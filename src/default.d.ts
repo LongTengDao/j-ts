@@ -6,5 +6,5 @@ declare const exports :transpileModule & Readonly<{
 }>;
 interface transpileModule {
 	(input :string, esv? :3 | 5) :string
-	(input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string }
+	(input :string, esv :object & { compilerOptions? :object & { target? :any, jsx? :void } }) :object & { outputText :string }
 }

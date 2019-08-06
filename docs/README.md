@@ -74,11 +74,12 @@ C.d = 0;
 
 |                                                             | `typescript` | `@ltd/j-ts`  |               Alt               |
 |-------------------------------------------------------------|:------------:|:------------:|---------------------------------|
-| `yield` / `return` / `throw` + type + eol + value           |      ✓      |      ✗      | - eol                           |
+| `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                           |
 | `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`        |
 | `export = f;`                                               |      ✓      |      ✗      | `module.exports = f;`           |
 | `import f = require('');`                                   |      ✓      |      ✗      | `var f = require('');`          |
 | `import { T } from '';`<br>`type U = T;`<br>`export { U };` |      ✓      |      ✗      | `export type U = import('').T;` |
+| `<div />` (React JSX)                                       |      ✓      |      ✗      | Vue / Angular                   |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------

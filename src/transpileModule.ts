@@ -103,27 +103,28 @@ let ts :string = '';
 let childNodes :Node[] = [];
 
 export default function transpileModule (input :string, esv? :3 | 5) :string;
-export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
-export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
+export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any, jsx? :void } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
+export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any, jsx? :void } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
 	try {
 		ts = coverHash(input);
-		return typeof esv==='object'
-			? {
-				outputText: recoverHash(from(createSourceFile(
-					'',
-					ts,
-					esv.compilerOptions && esv.compilerOptions.target!==undefined
-						? esv.compilerOptions.target===ES3 ? ES3
-						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv!)')
-						: Latest,
-					false,
-					TS,
-				))),
-				diagnostics: typescript_transpileModule(ts, esv).diagnostics,
-				sourceMapText: undefined,
-			}
-			: recoverHash(from(createSourceFile(
+		if ( typeof esv==='object' ) {
+			const { compilerOptions } = esv;
+			const { diagnostics } = typescript_transpileModule(ts, esv);
+			const outputText :string = recoverHash(from(createSourceFile(
+				'',
+				ts,
+				compilerOptions && compilerOptions.target!==undefined
+					? compilerOptions.target===ES3 ? ES3
+					: compilerOptions.target===ES5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv!)')
+					: Latest,
+				false,
+				TS,
+			)));
+			return { outputText, diagnostics, sourceMapText: undefined };
+		}
+		else {
+			return recoverHash(from(createSourceFile(
 				'',
 				ts,
 				esv
@@ -134,6 +135,7 @@ export default function transpileModule (input :string, esv? :3 | 5 | object & {
 				false,
 				TS,
 			)));
+		}
 	}
 	finally {
 		hashes.length = 0;

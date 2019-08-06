@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.3.0';
+const version = '4.3.1';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -113,27 +113,28 @@ let ts         = '';
 let childNodes         = [];
 
                                                                              
-                                                                                                                                                                                                                  
-function transpileModule (input        , esv                                                                   )                                                                                                     {
+                                                                                                                                                                                                                              
+function transpileModule (input        , esv                                                                               )                                                                                                     {
 	try {
 		ts = coverHash(input);
-		return typeof esv==='object'
-			? {
-				outputText: recoverHash(from(createSourceFile(
-					'',
-					ts,
-					esv.compilerOptions && esv.compilerOptions.target!==undefined$1
-						? esv.compilerOptions.target===ES3 ? ES3
-						: esv.compilerOptions.target===ES5 ? ES5
-							: throwRangeError('@ltd/j-ts(,esv!)')
-						: Latest,
-					false,
-					TS,
-				))),
-				diagnostics: typescript_transpileModule(ts, esv).diagnostics,
-				sourceMapText: undefined$1,
-			}
-			: recoverHash(from(createSourceFile(
+		if ( typeof esv==='object' ) {
+			const { compilerOptions } = esv;
+			const { diagnostics } = typescript_transpileModule(ts, esv);
+			const outputText         = recoverHash(from(createSourceFile(
+				'',
+				ts,
+				compilerOptions && compilerOptions.target!==undefined$1
+					? compilerOptions.target===ES3 ? ES3
+					: compilerOptions.target===ES5 ? ES5
+						: throwRangeError('@ltd/j-ts(,esv!)')
+					: Latest,
+				false,
+				TS,
+			)));
+			return { outputText, diagnostics, sourceMapText: undefined$1 };
+		}
+		else {
+			return recoverHash(from(createSourceFile(
 				'',
 				ts,
 				esv
@@ -144,6 +145,7 @@ function transpileModule (input        , esv                                    
 				false,
 				TS,
 			)));
+		}
 	}
 	finally {
 		hashes.length = 0;
