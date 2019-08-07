@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '5.0.0';
+const version = '5.1.0';
 
 const undefined$1 = void 0;
 

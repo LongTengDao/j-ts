@@ -30,7 +30,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-### `require('@ltd/j-ts')(input :string, es? :3 | 5)`
+### `require('@ltd/j-ts')(input :string, jsx? :boolean)`
 
 ```JavaScript
 	             
@@ -51,7 +51,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-### `require('typescript').transpileModule(input :string, options?).outputText`
+### `require('typescript').transpileModule(input :string, transpileOptions :object).outputText`
 
 ```JavaScript
 function* f(v) {
