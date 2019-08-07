@@ -59,3 +59,13 @@ var IMPORT            ;
                        
 
                  
+
+a => a ;
+
+function * g () {
+	yield ;
+	yield 1      ;
+	yield *
+		g ( ) ;
+	return       1 ;
+}

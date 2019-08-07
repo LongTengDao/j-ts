@@ -59,3 +59,13 @@ interface INTERFACE { }
 namespace NAMESPACE { }
 
 module MODULE { }
+
+a => a ;
+
+function * g () {
+	yield ;
+	yield 1 as 1 ;
+	yield *
+		g ( ) ;
+	return < 1 > 1 ;
+}

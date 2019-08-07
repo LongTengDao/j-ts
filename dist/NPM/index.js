@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '4.3.2';
+const version = '4.3.3';
 
 const throwRangeError = (
 	/*! j-globals: throw.RangeError (internal) */
@@ -472,6 +472,14 @@ function from (node      )         {
 					if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
 					es.push(from(child));
 					ts_index = child.end;
+					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					break;
+				case 2:
+					for ( const child of childNodes ) {
+						if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
+						es.push(from(child));
+						ts_index = child.end;
+					}
 					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 					break;
 				default:

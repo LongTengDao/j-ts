@@ -465,6 +465,14 @@ function from (node :Node) :string {
 					ts_index = child.end;
 					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 					break;
+				case 2:
+					for ( const child of childNodes ) {
+						if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
+						es.push(from(child));
+						ts_index = child.end;
+					}
+					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					break;
 				default:
 					throw Error(''+childNodes.length);
 			}

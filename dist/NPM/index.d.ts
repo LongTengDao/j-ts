@@ -2,7 +2,7 @@ export = exports;
 declare const exports :transpileModule & Readonly<{
 	default :typeof exports,
 	transpileModule :transpileModule,
-	version :'4.3.2',
+	version :'4.3.3',
 }>;
 interface transpileModule {
 	(input :string, esv? :3 | 5) :string
