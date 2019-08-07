@@ -1,12 +1,13 @@
 import Error from '.Error';
-import throwRangeError from '.throw.RangeError';
 import undefined from '.undefined';
 
 const {
-	transpileModule: typescript_transpileModule,
+	transpileModule: _transpileModule,
 	createSourceFile,
-	ScriptTarget: { ES3, ES5, Latest },
-	ScriptKind: { TS },
+	forEachChild,
+	JsxEmit: { None, Preserve, React, ReactNative },
+	ScriptTarget: { ESNext },
+	ScriptKind: { TS, TSX },
 	SyntaxKind: {
 		TypeAliasDeclaration,
 		TypeAssertionExpression,
@@ -73,7 +74,6 @@ const {
 		YieldExpression,
 		ParenthesizedType,
 	},
-	forEachChild,
 } = require('typescript');
 
 const S = /\S/g;
@@ -89,7 +89,11 @@ const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
 
 const EOL = /[\n\r\u2028\u2029]/;
 const WHITE = /(?<=^(?:\s+|\/(?:\/.*|\*.*?\*\/)))/s;
-const STRUCTURE = { [ReturnStatement]: 'return', [ThrowStatement]: 'throw', [YieldExpression]: 'yield' };
+const STRUCTURE = {
+	[ReturnStatement]: 'return',
+	[ThrowStatement]: 'throw',
+	[YieldExpression]: 'yield',
+};
 function EOL_VALUE_test (literal :string) :boolean {
 	for ( ; ; ) {
 		const index :number = literal.search(WHITE);
@@ -103,39 +107,45 @@ const hashes :number[] = [];
 let ts :string = '';
 let childNodes :Node[] = [];
 
-export default function transpileModule (input :string, esv? :3 | 5) :string;
-export default function transpileModule (input :string, esv :object & { compilerOptions? :object & { target? :any, jsx? :void } }) :object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
-export default function transpileModule (input :string, esv? :3 | 5 | object & { compilerOptions? :object & { target? :any, jsx? :void } }) :string | object & { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
+export default function transpileModule (input :string, jsx                 ? :boolean                                                  ) :string;
+export default function transpileModule (input :string,     transpileOptions  :          { compilerOptions? :{ jsx? :number | string } }) :         { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
+export default function transpileModule (input :string, jsx_transpileOptions? :boolean | { compilerOptions? :{ jsx? :number | string } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
 	try {
 		ts = coverHash(input);
-		if ( typeof esv==='object' ) {
-			const { compilerOptions } = esv;
-			const { diagnostics } = typescript_transpileModule(ts, esv);
-			const outputText :string = recoverHash(from(createSourceFile(
-				'',
-				ts,
-				compilerOptions && compilerOptions.target!==undefined
-					? compilerOptions.target===ES3 ? ES3
-					: compilerOptions.target===ES5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv!)')
-					: Latest,
-				false,
-				TS,
-			)));
-			return { outputText, diagnostics, sourceMapText: undefined };
+		if ( typeof jsx_transpileOptions==='object' ) {
+			let scriptKind;
+			const { compilerOptions } = jsx_transpileOptions;
+			if ( compilerOptions ) {
+				const { jsx } = compilerOptions;
+				switch ( jsx ) {
+					case undefined:
+					case None:
+					case 'None':
+						scriptKind = TS;
+						break;
+					case Preserve:
+					case ReactNative:
+					case 'Preserve':
+					case 'ReactNative':
+						scriptKind = TSX;
+						break;
+					case React:
+					case 'React':
+						throw Error('transpileModule(,{ compilerOptions: { jsx: React } })');
+					default:
+						throw Error('transpileModule(,{ compilerOptions: { jsx! } })');
+				}
+			}
+			else { scriptKind = TS; }
+			const { diagnostics } = _transpileModule(ts, jsx_transpileOptions);
+			return {
+				outputText: recoverHash(from(createSourceFile('', ts, ESNext, false, scriptKind))),
+				diagnostics,
+				sourceMapText: undefined,
+			};
 		}
 		else {
-			return recoverHash(from(createSourceFile(
-				'',
-				ts,
-				esv
-					? esv===3 ? ES3
-					: esv===5 ? ES5
-						: throwRangeError('@ltd/j-ts(,esv!)')
-					: Latest,
-				false,
-				TS,
-			)));
+			return recoverHash(from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)));
 		}
 	}
 	finally {

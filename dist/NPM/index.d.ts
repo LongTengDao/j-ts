@@ -1,10 +1,27 @@
 export = exports;
+
 declare const exports :transpileModule & Readonly<{
-	default :typeof exports,
+	
+	version :'5.0.0',
+	
 	transpileModule :transpileModule,
-	version :'4.3.3',
+	
+	default :typeof exports,
+	
 }>;
+
 interface transpileModule {
-	(input :string, esv? :3 | 5) :string
-	(input :string, esv :object & { compilerOptions? :object & { target? :any, jsx? :void } }) :object & { outputText :string }
+	
+	(input :string, jsx? :boolean) :string
+	
+	(input :string, transpileOptions :Readonly<object & {
+		compilerOptions? :Readonly<object & {
+			jsx? :number | string,
+		}>
+	}>) :object & {
+		outputText :string,
+		diagnostics :undefined | any[],
+		sourceMapText :undefined,
+	}
+	
 }

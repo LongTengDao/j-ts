@@ -19,8 +19,4 @@ declare module '.default' { export default Default;
 	type Newable = { new (...args :any[]) :any };
 }
 
-declare module '.throw.RangeError' { export default throwRangeError;
-	function throwRangeError (message? :string) :never;
-}
-
 declare module '.undefined' { export default undefined; }

@@ -72,18 +72,16 @@ C.d = 0;
 `typescript` ko `@ltd/j-ts`
 ---------------------------
 
-|                                                             | `typescript` | `@ltd/j-ts`  |               Alt               |
-|-------------------------------------------------------------|:------------:|:------------:|---------------------------------|
-| `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                           |
-| `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`        |
-| `export = f;`                                               |      ✓      |      ✗      | `module.exports = f;`           |
-| `import f = require('');`                                   |      ✓      |      ✗      | `var f = require('');`          |
-| `import { T } from '';`<br>`type U = T;`<br>`export { U };` |      ✓      |      ✗      | `export type U = import('').T;` |
-| `<div />` (React JSX)                                       |      ✓      |      ✗      | Vue / Angular                   |
+|                                                             | `typescript` | `@ltd/j-ts`  |               Alt                               |
+|-------------------------------------------------------------|:------------:|:------------:|-------------------------------------------------|
+| `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                                           |
+| `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`                        |
+| `import f = require('');`<br>`export = f;`                  |      ✓      |      ✗      | `var f = require('');`<br>`module.exports = f;` |
+| `import { T } from '';`<br>`type U = T;`<br>`export { U };` |      ✓      |      ✗      | `export type U = import('').T;`                 |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------
 
-|                       | `@ltd/j-ts`  | `typescript` |              Alt             |
-|-----------------------|:------------:|:------------:|------------------------------|
-| `class { #property }` |      ✓      |      ✗      | `class { private property }` |
+|                     | `@ltd/j-ts`  | `typescript` |              Alt           |
+|---------------------|:------------:|:------------:|----------------------------|
+| `class { #stage3 }` |      ✓      |      ✗      | `class { private stage3 }` |

@@ -1,7 +1,7 @@
 {
 	"name": "@ltd/j-ts",
 	"description": "Pure transpiler for TypeScript. Belong to \"Plan J\".／TypeScript 纯转译工具。从属于“简计划”。",
-	"version": "4.3.3",
+	"version": "5.0.0",
 	"license": "LGPL-3.0",
 	"author": "龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)",
 	"bugs": "https://GitHub.com/LongTengDao/j-ts/issues",
