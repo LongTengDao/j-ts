@@ -1,16 +1,22 @@
 # http://editorconfig.org
 
-[docs/*]
+[*]
+indent_size = 4
+
+[.*]
+indent_size = 4
+
+[/docs/*]
 charset = utf-8-bom
 end_of_line = crlf
 trim_trailing_whitespace = false
 
-[test/sample*.ts]
+[/test/sample*.ts]
 charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-[test/expect*.js]
+[/test/expect*.js]
 charset = utf-8
 trim_trailing_whitespace = false
 insert_final_newline = false
