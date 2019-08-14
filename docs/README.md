@@ -30,7 +30,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-### `require('@ltd/j-ts')(input :string, jsx? :boolean)`
+### `require('@ltd/j-ts')(input :string, jsx :boolean = false)`
 
 ```JavaScript
 	             
@@ -51,7 +51,7 @@ npm install @ltd/j-ts
 	}
 ```
 
-### `require('typescript').transpileModule(input :string, transpileOptions :object).outputText`
+### `require('typescript').transpileModule(input :string, options :{}).outputText`
 
 ```JavaScript
 function* f(v) {
@@ -72,7 +72,7 @@ C.d = 0;
 `typescript` ko `@ltd/j-ts`
 ---------------------------
 
-|                                                             | `typescript` | `@ltd/j-ts`  |               Alt                               |
+|                                                             | `typescript` | `@ltd/j-ts`  |                 <kbd>Alt</kbd>                  |
 |-------------------------------------------------------------|:------------:|:------------:|-------------------------------------------------|
 | `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                                           |
 | `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`                        |
@@ -82,6 +82,8 @@ C.d = 0;
 `@ltd/j-ts` ko `typescript`
 ---------------------------
 
-|                     | `@ltd/j-ts`  | `typescript` |              Alt           |
-|---------------------|:------------:|:------------:|----------------------------|
-| `class { #stage3 }` |      ✓      |      ✗      | `class { private stage3 }` |
+|                             | `@ltd/j-ts`  | `typescript` |          <kbd>Alt</kbd>           |
+|-----------------------------|:------------:|:------------:|-----------------------------------|
+| `class { stage3define }`    |      ✓      |      ✗      | `Object.defineProperty`           |
+| `class { #stage3private }`  |      ✓      |      ✗      | `WeakMap<Public, Private>`        |
+| `let v:T=/*#__PURE__*/f();` |      ✓      |      ✗      | `let v:T=`<br>`/*#__PURE__*/f();` |
