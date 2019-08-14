@@ -14,7 +14,7 @@ class CLASS                            extends Map                              
 	
 	'property1'     ;
 	property2     = 2 ;
-	[ 'property3' ] = 3 ;
+	[               'property3'                ] = 3 ;
 	
 	         propertyA ;
 	             
@@ -22,7 +22,7 @@ class CLASS                            extends Map                              
 	
 	static 'property1'     ;
 	static property2     = 2 ;
-	static [ 'property3' ] = 3 ;
+	static [               'property3'                ] = 3 ;
 	
 	get accessor ( )     { return 1 ; }
 	set 'accessor' ( value     ) { }
