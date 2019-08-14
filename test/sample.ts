@@ -14,7 +14,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	
 	'property1' : 1 ;
 	property2 : 2 = 2 ;
-	[ 'property3' ] = 3 ;
+	[ <'property3'> 'property3' as 'property3' ] = 3 ;
 	
 	readonly propertyA ;
 	propertyB ? ;
@@ -22,7 +22,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	
 	static 'property1' : 1 ;
 	static property2 : 2 = 2 ;
-	static [ 'property3' ] = 3 ;
+	static [ <'property3'> 'property3' as 'property3' ] = 3 ;
 	
 	get accessor ( ) : 1 { return 1 ; }
 	set 'accessor' ( value : 1 ) { }
