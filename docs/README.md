@@ -82,8 +82,8 @@ C.d = 0;
 `@ltd/j-ts` ko `typescript`
 ---------------------------
 
-|                             | `@ltd/j-ts`  | `typescript` |          <kbd>Alt</kbd>           |
-|-----------------------------|:------------:|:------------:|-----------------------------------|
-| `class { stage3define }`    |      ✓      |      ✗      | `Object.defineProperty`           |
-| `class { #stage3private }`  |      ✓      |      ✗      | `WeakMap<Public, Private>`        |
-| `let v:T=/*#__PURE__*/f();` |      ✓      |      ✗      | `let v:T=`<br>`/*#__PURE__*/f();` |
+|                                 | `@ltd/j-ts`  | `typescript` |          <kbd>Alt</kbd>              |
+|---------------------------------|:------------:|:------------:|--------------------------------------|
+| `class {  stage3define;  }`     |      ✓      |      ✗      | `Object.defineProperty`              |
+| `class { #stage3private; }`     |      ✓      |      ✗      | `WeakMap<Public, Private>`           |
+| `let v :T = /*#__PURE__*/ f();` |      ✓      |      ✗      | `let v :T =`<br>`/*#__PURE__*/ f();` |
