@@ -27,7 +27,7 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 				'Pure transpiler for TypeScript. Belong to "Plan J".／'+
 				'TypeScript 纯转译工具。从属于“简计划”。',
 			dependencies: {
-				typescript: '3.5.3',
+				'typescript': '3.5.3',
 			},
 		},
 		ES: 6,
