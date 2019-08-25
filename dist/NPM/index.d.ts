@@ -2,7 +2,7 @@ export = exports;
 
 declare const exports :transpileModule & Readonly<{
 	
-	version :'5.1.0',
+	version :'5.1.1',
 	
 	transpileModule :transpileModule,
 	
@@ -12,7 +12,7 @@ declare const exports :transpileModule & Readonly<{
 
 interface transpileModule {
 	
-	(input :string, jsx? :boolean) :string
+	(input :string, jsx? :false | true) :string
 	
 	(input :string, transpileOptions :Readonly<object & {
 		compilerOptions? :Readonly<object & {

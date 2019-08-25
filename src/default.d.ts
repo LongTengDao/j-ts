@@ -12,7 +12,7 @@ declare const exports :transpileModule & Readonly<{
 
 interface transpileModule {
 	
-	(input :string, jsx? :boolean) :string
+	(input :string, jsx? :false | true) :string
 	
 	(input :string, transpileOptions :Readonly<object & {
 		compilerOptions? :Readonly<object & {

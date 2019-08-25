@@ -73,6 +73,8 @@ const {
 		ThrowStatement,
 		YieldExpression,
 		ParenthesizedType,
+		ConstructorType,
+		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
 
@@ -204,6 +206,7 @@ function afterColon (node :Node) :boolean {
 		case IndexedAccessType:
 		case IntersectionType:
 		case ConditionalType:
+		case ConstructorType:
 		case FunctionType:
 		case LiteralType:
 		case MappedType:
@@ -239,12 +242,13 @@ function afterColon (node :Node) :boolean {
 
 function from (node :Node) :string {
 	switch ( node.kind ) {
+		//case NamespaceExportDeclaration:
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
+		case ProtectedKeyword:
 		case ReadonlyKeyword:
 		case PrivateKeyword:
-		case ProtectedKeyword:
 		case PublicKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:

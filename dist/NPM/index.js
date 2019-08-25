@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '5.1.0';
+const version = '5.1.1';
 
 const undefined$1 = void 0;
 
@@ -76,6 +76,8 @@ const {
 		ThrowStatement,
 		YieldExpression,
 		ParenthesizedType,
+		ConstructorType,
+		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
 
@@ -206,6 +208,7 @@ function afterColon (node      )          {
 		case IndexedAccessType:
 		case IntersectionType:
 		case ConditionalType:
+		case ConstructorType:
 		case FunctionType:
 		case LiteralType:
 		case MappedType:
@@ -241,12 +244,13 @@ function afterColon (node      )          {
 
 function from (node      )         {
 	switch ( node.kind ) {
+		//case NamespaceExportDeclaration:
 		case TypeAliasDeclaration:
 		case InterfaceDeclaration:
 		case ModuleDeclaration:
+		case ProtectedKeyword:
 		case ReadonlyKeyword:
 		case PrivateKeyword:
-		case ProtectedKeyword:
 		case PublicKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
@@ -518,17 +522,25 @@ const freeze = Object.freeze;
 
 const seal = Object.seal;
 
+const NULL = (
+	/*! j-globals: null.prototype (internal) */
+	Object.create
+		? /*#__PURE__*/ Object.preventExtensions(Object.create(null))
+		: null
+	/*¡ j-globals: null.prototype (internal) */
+);
+
 const Default = (
 	/*! j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
 		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
-			if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(null); }
+			if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(NULL); }
 			if ( assign ) { assign(exports, addOnOrigin); }
 			else { for ( var key in addOnOrigin ) { if ( hasOwnProperty.call(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
 			exports['default'] = exports;
 			typeof exports==='function' && exports.prototype && seal(exports.prototype);
 			if ( toStringTag ) {
-				var descriptor = create(null);
+				var descriptor = create(NULL);
 				descriptor.value = 'Module';
 				defineProperty(exports, toStringTag, descriptor);
 			}

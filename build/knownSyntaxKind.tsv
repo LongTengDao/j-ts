@@ -63,6 +63,8 @@
    	ThrowStatement
    	YieldExpression
    	ParenthesizedType
+   	NamespaceExportDeclaration
+   	ConstructorType
    	
   0	Unknown
   2	SingleLineCommentTrivia
@@ -206,7 +208,6 @@
 163	IndexSignature
 164	TypePredicate
    	
-167	ConstructorType
 172	OptionalType
 173	RestType
 177	InferType
@@ -257,7 +258,6 @@
 239	VariableDeclarationList
 246	ModuleBlock
 247	CaseBlock
-248	NamespaceExportDeclaration
 250	ImportDeclaration
 251	ImportClause
 252	NamespaceImport
