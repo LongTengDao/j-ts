@@ -65,7 +65,7 @@
 ✓	ParenthesizedType	
 ✓	NamespaceExportDeclaration	
 ✓	ConstructorType	
----		
+		
 000	Unknown	
 002	SingleLineCommentTrivia	
 003	MultiLineCommentTrivia	
@@ -123,7 +123,8 @@
 055	BarBarToken	
 057	ColonToken	
 058	AtToken	
-059	BacktickToken	Only the JSDoc scanner produces BacktickToken. The normal scanner produces NoSubstitutionTemplateLiteral and related kinds.
+059	BacktickToken	Only the JSDoc scanner produces BacktickToken.
+		The normal scanner produces NoSubstitutionTemplateLiteral and related kinds.
 060	EqualsToken	
 061	PlusEqualsToken	
 062	MinusEqualsToken	
@@ -178,7 +179,7 @@
 117	StaticKeyword	
 118	YieldKeyword	
 119	AbstractKeyword	
-^^^	FirstContextualKeyword	internal
+	FirstContextualKeyword	internal
 120	AsKeyword	
 122	AsyncKeyword	
 123	AwaitKeyword	
@@ -196,7 +197,7 @@
 145	FromKeyword	
 146	GlobalKeyword	
 148	OfKeyword	
-^^^	LastContextualKeyword	internal
+	LastContextualKeyword	internal
 149	QualifiedName	
 150	ComputedPropertyName	
 153	Decorator	
@@ -207,13 +208,13 @@
 162	ConstructSignature	
 163	IndexSignature	
 164	TypePredicate	
-...		
+		
 172	OptionalType	
 173	RestType	
 177	InferType	
 179	ThisType	
 184	ImportType	
-...		
+		
 185	ObjectBindingPattern	
 186	ArrayBindingPattern	
 187	BindingElement	
