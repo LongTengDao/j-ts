@@ -65,7 +65,7 @@
 ✓	ParenthesizedType	
 ✓	NamespaceExportDeclaration	
 ✓	ConstructorType	
-		
+—		
 000	Unknown	
 002	SingleLineCommentTrivia	
 003	MultiLineCommentTrivia	
@@ -208,13 +208,13 @@
 162	ConstructSignature	
 163	IndexSignature	
 164	TypePredicate	
-		
+…		
 172	OptionalType	
 173	RestType	
 177	InferType	
 179	ThisType	
 184	ImportType	
-		
+…		
 185	ObjectBindingPattern	
 186	ArrayBindingPattern	
 187	BindingElement	
@@ -326,6 +326,7 @@
 316	MergeDeclarationMarker	
 317	EndOfDeclarationMarker	
 318	Count	
+—		
 060	FirstAssignment	
 072	LastAssignment	
 061	FirstCompoundAssignment	

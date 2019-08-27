@@ -7,6 +7,7 @@ indent_size = 4
 indent_size = 4
 
 [/build/*.tsv]
+indent_size = 45
 trim_trailing_whitespace = false
 insert_final_newline = false
 
