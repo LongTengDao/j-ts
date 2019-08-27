@@ -6,6 +6,10 @@ indent_size = 4
 [.*]
 indent_size = 4
 
+[/build/*.tsv]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
 [/docs/*]
 charset = utf-8-bom
 end_of_line = crlf

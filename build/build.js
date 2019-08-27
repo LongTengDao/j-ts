@@ -1,18 +1,16 @@
 'use strict';
 
 const { SyntaxKind } = require('typescript');
-const index = /^\d+$/;
-
-const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=\t)\w+/g));
+const INDEX = /^\d+$/;
+const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=^ *\d*\t)\w+/gm));
 const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
-	if ( index.test(kind) ) { return false; }
+	if ( INDEX.test(kind) ) { return false; }
 	if ( known.has(kind) ) {
 		known.delete(kind);
 		return false;
 	}
 	return true;
 });
-
 if ( known.size ) { throw Error(`TypeScript.SyntaxKind (known) not found:\n${[ ...known ].join('\n')}`); }
 if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind (unknown) found:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}`).join('')}`); }
 
