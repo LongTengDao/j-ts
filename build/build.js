@@ -2,7 +2,7 @@
 
 const { SyntaxKind } = require('typescript');
 const INDEX = /^\d+$/;
-const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=^ *\d*\t)\w+/gm));
+const known = new Set(require('fs').readFileSync(__dirname+'/knownSyntaxKind.tsv', 'utf8').match(/(?<=^(?:\[x]|\d\d\d|\^\^\^)\t)\w+/gm));
 const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
 	if ( INDEX.test(kind) ) { return false; }
 	if ( known.has(kind) ) {
