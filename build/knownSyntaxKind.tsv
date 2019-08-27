@@ -1,4 +1,5 @@
 Num	Name	Descr
+===		
    	TypeAliasDeclaration	
    	TypeAssertionExpression	
    	AsExpression	
@@ -65,7 +66,7 @@ Num	Name	Descr
    	ParenthesizedType	
    	NamespaceExportDeclaration	
    	ConstructorType	
-   		
+---		
   0	Unknown	
   2	SingleLineCommentTrivia	
   3	MultiLineCommentTrivia	
@@ -178,7 +179,7 @@ Num	Name	Descr
 117	StaticKeyword	
 118	YieldKeyword	
 119	AbstractKeyword	
-   	FirstContextualKeyword	internal
+ `-	FirstContextualKeyword	internal
 120	AsKeyword	
 122	AsyncKeyword	
 123	AwaitKeyword	
@@ -196,7 +197,7 @@ Num	Name	Descr
 145	FromKeyword	
 146	GlobalKeyword	
 148	OfKeyword	
-   	LastContextualKeyword	internal
+ `-	LastContextualKeyword	internal
 149	QualifiedName	
 150	ComputedPropertyName	
 153	Decorator	
@@ -207,13 +208,13 @@ Num	Name	Descr
 162	ConstructSignature	
 163	IndexSignature	
 164	TypePredicate	
----	---	
+---		
 172	OptionalType	
 173	RestType	
 177	InferType	
 179	ThisType	
 184	ImportType	
----	---	
+---		
 185	ObjectBindingPattern	
 186	ArrayBindingPattern	
 187	BindingElement	
@@ -352,4 +353,3 @@ Num	Name	Descr
 311	LastJSDocNode	
 300	FirstJSDocTagNode	
 311	LastJSDocTagNode	
----	---	
