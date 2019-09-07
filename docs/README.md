@@ -40,11 +40,11 @@ npm install @ltd/j-ts
 	}
 	
 	class C extends S {
-		   
+		a ;
 		b;
 		c  = 0;
 		d = 0;
-		          
+		static a ;
 		static b;
 		static c  = 0;
 		static d = 0;

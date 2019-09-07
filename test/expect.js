@@ -17,7 +17,7 @@ class CLASS                            extends Map                              
 	[               'property3'                ] = 3 ;
 	
 	         propertyA ;
-	             
+	propertyB   ;
 	propertyC   = 0 ;
 	
 	static 'property1'     ;

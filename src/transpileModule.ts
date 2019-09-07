@@ -419,27 +419,7 @@ function from (node :Node) :string {
 			}
 			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
 			break;
-		case PropertyDeclaration: {
-			let question_declaration :boolean = false;
-			for ( const child of childNodes ) {
-				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
-				else if ( child.kind===QuestionToken ) {
-					es.push(ts.slice(ts_index, child.end-1)+' ');
-					question_declaration = true;
-				}
-				else {
-					if ( ts_index!==child.pos ) {
-						if ( question_declaration && ts[child.pos-1]==='=' ) { question_declaration = false; }
-						es.push(ts.slice(ts_index, child.pos));
-					}
-					es.push(from(child));
-				}
-				ts_index = child.end;
-			}
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
-			if ( question_declaration ) { return remove(ts.slice(node.pos, node.end)); }
-			break;
-		}
+		case PropertyDeclaration:
 		case Parameter:
 			for ( const child of childNodes ) {
 				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
