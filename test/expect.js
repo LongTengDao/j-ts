@@ -6,6 +6,9 @@
 
 class CLASS                            extends Map                                                {
 	
+	                         
+	                          
+	
 	                 
 	[ 'method' ] ( )        { }
 	

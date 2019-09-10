@@ -6,6 +6,9 @@
 
 class CLASS < T extends any, U = any > extends Map < any , any > implements INTERFACE , INTERFACE {
 	
+	[ name : string ] : any ;
+	[ index : number ] : any ;
+	
 	method ( ) : void
 	[ 'method' ] ( ) : void { }
 	
