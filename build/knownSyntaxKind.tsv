@@ -65,6 +65,7 @@
 ✓	ParenthesizedType	
 ✓	NamespaceExportDeclaration	
 ✓	ConstructorType	
+✓	IndexSignature	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -206,7 +207,6 @@
 158	Constructor	
 161	CallSignature	
 162	ConstructSignature	
-163	IndexSignature	
 164	TypePredicate	
 …		
 172	OptionalType	

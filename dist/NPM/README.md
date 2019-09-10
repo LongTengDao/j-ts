@@ -2,7 +2,7 @@
 `@ltd/j-ts`
 ===========
 
-```shell
+```
 npm install @ltd/j-ts
 ```
 
@@ -11,7 +11,7 @@ npm install @ltd/j-ts
 
 ### `input.ts`
 
-```TypeScript
+```
 	type T = any;
 	
 	function f (v :T) :T {
@@ -32,7 +32,7 @@ npm install @ltd/j-ts
 
 ### `require('@ltd/j-ts')(input :string, jsx :boolean = false)`
 
-```JavaScript
+```
 	             
 	
 	function f (v   )    {
@@ -53,7 +53,7 @@ npm install @ltd/j-ts
 
 ### `require('typescript').transpileModule(input :string, options :{}).outputText`
 
-```JavaScript
+```
 function* f(v) {
     return v;
 }

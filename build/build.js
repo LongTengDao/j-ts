@@ -32,5 +32,5 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 		semver: await get('src/version'),
 		LICENSE_: true,
 	});
-	await map('docs/README.md', 'dist/NPM/README.md');
+	await map('docs/README.md', gh => gh.replace(/(?<=[\n\r][ \t]*```+)[ \t]*\.?\w+[ \t]*(?=[\n\r])/g, ''), 'dist/NPM/README.md');
 });

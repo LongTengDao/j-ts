@@ -74,6 +74,7 @@ const {
 		YieldExpression,
 		ParenthesizedType,
 		ConstructorType,
+		IndexSignature,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -250,18 +251,19 @@ function from (node :Node) :string {
 		case ReadonlyKeyword:
 		case PrivateKeyword:
 		case PublicKeyword:
+		case IndexSignature:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
-			throw Error('enum');
+			throw Error('enum _ {}');
 		case ImportEqualsDeclaration:
-			throw Error('import $ = require()');
+			throw Error('import _ = require();');
 	}
 	const childNodes :Node[] = ChildNodes(node);
 	if ( childNodes.length ) {
 		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 		if ( node.kind===ExportAssignment ) {
 			const { pos } :Node = childNodes[0];
-			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = $'); }
+			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
 		}
 	}
 	let ts_index :number = node.pos;

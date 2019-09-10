@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.0.0';
+const version = '6.0.1';
 
 const undefined$1 = void 0;
 
@@ -77,6 +77,7 @@ const {
 		YieldExpression,
 		ParenthesizedType,
 		ConstructorType,
+		IndexSignature,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -252,18 +253,19 @@ function from (node      )         {
 		case ReadonlyKeyword:
 		case PrivateKeyword:
 		case PublicKeyword:
+		case IndexSignature:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
-			throw Error('enum');
+			throw Error('enum _ {}');
 		case ImportEqualsDeclaration:
-			throw Error('import $ = require()');
+			throw Error('import _ = require();');
 	}
 	const childNodes         = ChildNodes(node);
 	if ( childNodes.length ) {
 		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
 		if ( node.kind===ExportAssignment ) {
 			const { pos }       = childNodes[0];
-			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = $'); }
+			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
 		}
 	}
 	let ts_index         = node.pos;
