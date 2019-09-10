@@ -1,15 +1,10 @@
 'use strict';
 
-const typescript = require('typescript');
-
 const EOL = /\r\n?|[\n\u2028\u2029]/;
 
 module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import_default, get, put }) {
 	const transpileModule = await import_default('src/default', {
-		require (id) {
-			if ( id!=='typescript' ) { throw `require("${id}")`; }
-			return typescript;
-		},
+		require: [ 'typescript' ],
 		ES: 6,
 	});
 	const sample = await get('test/sample.ts');
@@ -44,6 +39,7 @@ function throwError (message, lineNumber, columnNumber) {
 	error.stack = [
 		`Error: ${message}`,
 		`    at ${__dirname}${sep}sample.ts:${lineNumber}:${columnNumber}`,
+		`    at ${__dirname}${sep}output.js:${lineNumber}:${columnNumber}`,
 		`    at ${__dirname}${sep}expect.js:${lineNumber}:${columnNumber}`,
 	].join('\n');
 	throw error;

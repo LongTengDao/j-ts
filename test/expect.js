@@ -4,7 +4,14 @@
 	function (        arg ) { },
 ];
 
+         class SUPER {
+	                            
+	//public abstract readonly property ;
+}
+
 class CLASS                            extends Map                                                {
+	
+	constructor (          a ,                 b ,           c = 3 ,         d   ) { super(); }
 	
 	                         
 	                          

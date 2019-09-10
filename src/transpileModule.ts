@@ -75,6 +75,7 @@ const {
 		ParenthesizedType,
 		ConstructorType,
 		IndexSignature,
+		AbstractKeyword,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -252,11 +253,12 @@ function from (node :Node) :string {
 		case PrivateKeyword:
 		case PublicKeyword:
 		case IndexSignature:
+		case AbstractKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
-			throw Error('enum _ {}');
+			throw Error('enum _ { }');
 		case ImportEqualsDeclaration:
-			throw Error('import _ = require();');
+			throw Error('import _ = require( );');
 	}
 	const childNodes :Node[] = ChildNodes(node);
 	if ( childNodes.length ) {

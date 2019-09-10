@@ -20,13 +20,13 @@ npm install @ltd/j-ts
 	
 	class C extends S {
 		a?;
-		b;
+		b ;
 		c? = 0;
-		d = 0;
+		d  = 0;
 		static a?;
-		static b;
+		static b ;
 		static c? = 0;
-		static d = 0;
+		static d  = 0;
 	}
 ```
 
@@ -41,13 +41,13 @@ npm install @ltd/j-ts
 	
 	class C extends S {
 		a ;
-		b;
+		b ;
 		c  = 0;
-		d = 0;
+		d  = 0;
 		static a ;
-		static b;
+		static b ;
 		static c  = 0;
-		static d = 0;
+		static d  = 0;
 	}
 ```
 
@@ -76,7 +76,8 @@ C.d = 0;
 |-------------------------------------------------------------|:------------:|:------------:|-------------------------------------------------|
 | `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                                           |
 | `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`                        |
-| `import f = require('');`<br>`export = f;`                  |      ✓      |      ✗      | `var f = require('');`<br>`module.exports = f;` |
+| `import f = require('');`                                   |      ✓      |      ✗      | `var f = require('');`                          |
+| `export = f;`                                               |      ✓      |      ✗      | `module.exports = f;`                           |
 | `import { T } from '';`<br>`type U = T;`<br>`export { U };` |      ✓      |      ✗      | `export type U = import('').T;`                 |
 
 `@ltd/j-ts` ko `typescript`

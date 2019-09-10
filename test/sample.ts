@@ -4,7 +4,14 @@
 	function ( this , arg ) { },
 ];
 
+abstract class SUPER {
+	public abstract method ( ) ;
+	//public abstract readonly property ;
+}
+
 class CLASS < T extends any, U = any > extends Map < any , any > implements INTERFACE , INTERFACE {
+	
+	constructor ( readonly a , public readonly b , protected c = 3 , private d ? ) { super(); }
 	
 	[ name : string ] : any ;
 	[ index : number ] : any ;

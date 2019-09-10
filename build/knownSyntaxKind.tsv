@@ -1,4 +1,4 @@
-№	Name	Descr
+№	Name	Description
 ✓	TypeAliasDeclaration	
 ✓	TypeAssertionExpression	
 ✓	AsExpression	
@@ -66,6 +66,8 @@
 ✓	NamespaceExportDeclaration	
 ✓	ConstructorType	
 ✓	IndexSignature	
+✓	AbstractKeyword	
+	FirstContextualKeyword	(internal)
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -179,8 +181,6 @@
 113	PackageKeyword	
 117	StaticKeyword	
 118	YieldKeyword	
-119	AbstractKeyword	
-	FirstContextualKeyword	internal
 120	AsKeyword	
 122	AsyncKeyword	
 123	AwaitKeyword	

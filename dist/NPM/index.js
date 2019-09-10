@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.0.1';
+const version = '6.0.2';
 
 const undefined$1 = void 0;
 
@@ -78,6 +78,7 @@ const {
 		ParenthesizedType,
 		ConstructorType,
 		IndexSignature,
+		AbstractKeyword,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -254,11 +255,12 @@ function from (node      )         {
 		case PrivateKeyword:
 		case PublicKeyword:
 		case IndexSignature:
+		case AbstractKeyword:
 			return remove(ts.slice(node.pos, node.end));
 		case EnumDeclaration:
-			throw Error('enum _ {}');
+			throw Error('enum _ { }');
 		case ImportEqualsDeclaration:
-			throw Error('import _ = require();');
+			throw Error('import _ = require( );');
 	}
 	const childNodes         = ChildNodes(node);
 	if ( childNodes.length ) {
