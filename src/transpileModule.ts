@@ -76,6 +76,7 @@ const {
 		ConstructorType,
 		IndexSignature,
 		AbstractKeyword,
+		ThisType,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -215,6 +216,7 @@ function afterColon (node :Node) :boolean {
 		case UnionType:
 		case TupleType:
 		case ArrayType:
+		case ThisType:
 		
 		case FirstTypeNode:
 		case LastTypeNode:

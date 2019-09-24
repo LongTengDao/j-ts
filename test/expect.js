@@ -17,7 +17,7 @@ class CLASS                            extends Map                              
 	                          
 	
 	                 
-	[ 'method' ] ( )        { }
+	[ 'method' ] (             )        { }
 	
 	                        
 	static [ 'method' ] ( )        { }

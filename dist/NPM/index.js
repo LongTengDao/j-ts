@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.0.2';
+const version = '6.0.3';
 
 const undefined$1 = void 0;
 
@@ -79,6 +79,7 @@ const {
 		ConstructorType,
 		IndexSignature,
 		AbstractKeyword,
+		ThisType,
 		//NamespaceExportDeclaration,
 	},
 } = require('typescript');
@@ -217,6 +218,7 @@ function afterColon (node      )          {
 		case UnionType:
 		case TupleType:
 		case ArrayType:
+		case ThisType:
 		
 		case FirstTypeNode:
 		case LastTypeNode:

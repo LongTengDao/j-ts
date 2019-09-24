@@ -17,7 +17,7 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	[ index : number ] : any ;
 	
 	method ( ) : void
-	[ 'method' ] ( ) : void { }
+	[ 'method' ] ( this : this ) : void { }
 	
 	static method ( ) : void
 	static [ 'method' ] ( ) : void { }

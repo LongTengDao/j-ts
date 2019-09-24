@@ -14,7 +14,7 @@ npm install @ltd/j-ts
 ```
 	type T = any;
 	
-	function f (v :T) :T {
+	function * f (v :T) :T {
 		return <T> v as T;
 	}
 	
@@ -35,7 +35,7 @@ npm install @ltd/j-ts
 ```
 	             
 	
-	function f (v   )    {
+	function * f (v   )    {
 		return     v     ;
 	}
 	

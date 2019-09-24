@@ -67,7 +67,8 @@
 ✓	ConstructorType	
 ✓	IndexSignature	
 ✓	AbstractKeyword	
-	FirstContextualKeyword	(internal)
+	FirstContextualKeyword	(internal)	
+✓	ThisType	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -212,7 +213,6 @@
 172	OptionalType	
 173	RestType	
 177	InferType	
-179	ThisType	
 184	ImportType	
 …		
 185	ObjectBindingPattern	
