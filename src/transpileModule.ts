@@ -356,8 +356,8 @@ function from (node :Node) :string {
 			}
 			break;
 		}
-		case FunctionDeclaration:
-		case MethodDeclaration: {
+		case MethodDeclaration:
+		case FunctionDeclaration: {
 			let declaration :boolean = true;
 			for ( const child of childNodes ) {
 				if ( child.kind===Block ) {
@@ -377,8 +377,8 @@ function from (node :Node) :string {
 					if ( THIS.test(maybeThis) ) {
 						child.kind = TypeAliasDeclaration;
 						const { end } :Node = child;
-						const indexOfComma :number = ts.slice(end, childNodes[index+1].pos).search(COMMA);
-						if ( indexOfComma>=0 ) { child.end = end+indexOfComma+1; }
+						const indexAfterComma :number = ts.slice(end, childNodes[index+1].pos).search(COMMA)+1;
+						if ( indexAfterComma ) { child.end = end+indexAfterComma; }
 					}
 					break;
 				}
@@ -409,7 +409,10 @@ function from (node :Node) :string {
 						es.push(removeFirstGT(ts.slice(ts_index, child.pos)));
 					}
 					else if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-					es.push(from(child));
+					es.push(child.kind===QuestionToken && node.kind===MethodDeclaration
+						? ts.slice(ts_index, child.end-1)+' '
+						: from(child)
+					);
 				}
 				ts_index = child.end;
 			}

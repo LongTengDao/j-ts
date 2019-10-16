@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.0.3';
+const version = '6.0.4';
 
 const undefined$1 = void 0;
 
@@ -358,8 +358,8 @@ function from (node      )         {
 			}
 			break;
 		}
-		case FunctionDeclaration:
-		case MethodDeclaration: {
+		case MethodDeclaration:
+		case FunctionDeclaration: {
 			let declaration          = true;
 			for ( const child of childNodes ) {
 				if ( child.kind===Block ) {
@@ -379,8 +379,8 @@ function from (node      )         {
 					if ( THIS.test(maybeThis) ) {
 						child.kind = TypeAliasDeclaration;
 						const { end }       = child;
-						const indexOfComma         = ts.slice(end, childNodes[index+1].pos).search(COMMA);
-						if ( indexOfComma>=0 ) { child.end = end+indexOfComma+1; }
+						const indexAfterComma         = ts.slice(end, childNodes[index+1].pos).search(COMMA)+1;
+						if ( indexAfterComma ) { child.end = end+indexAfterComma; }
 					}
 					break;
 				}
@@ -411,7 +411,10 @@ function from (node      )         {
 						es.push(removeFirstGT(ts.slice(ts_index, child.pos)));
 					}
 					else if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-					es.push(from(child));
+					es.push(child.kind===QuestionToken && node.kind===MethodDeclaration
+						? ts.slice(ts_index, child.end-1)+' '
+						: from(child)
+					);
 				}
 				ts_index = child.end;
 			}

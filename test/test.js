@@ -11,7 +11,7 @@ module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import
 	const output = transpileModule(sample);
 	const expect = await get('test/expect.js');
 	if ( output!==expect ) {
-		await put('test/output.js', output);
+		await put('test/output#.js', output);
 		const outputLines = output.split(EOL);
 		const expectLines = expect.split(EOL);
 		const length = Math.min(output.length, expect.length);
@@ -39,7 +39,7 @@ function throwError (message, lineNumber, columnNumber) {
 	error.stack = [
 		`Error: ${message}`,
 		`    at ${__dirname}${sep}sample.ts:${lineNumber}:${columnNumber}`,
-		`    at ${__dirname}${sep}output.js:${lineNumber}:${columnNumber}`,
+		`    at ${__dirname}${sep}output#.js:${lineNumber}:${columnNumber}`,
 		`    at ${__dirname}${sep}expect.js:${lineNumber}:${columnNumber}`,
 	].join('\n');
 	throw error;
