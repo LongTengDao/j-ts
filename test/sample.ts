@@ -5,6 +5,7 @@
 ];
 
 abstract class SUPER {
+	abstract get accessor ( ) : string ;
 	public abstract method ( ) ;
 	//public abstract readonly property ;
 }
