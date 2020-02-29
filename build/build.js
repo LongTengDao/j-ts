@@ -12,7 +12,7 @@ const unknown = Reflect.ownKeys(SyntaxKind).filter(kind => {
 	return true;
 });
 if ( known.size ) { throw Error(`TypeScript.SyntaxKind (known) not found:\n${[ ...known ].join('\n')}`); }
-if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind (unknown) found:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}`).join('')}`); }
+if ( unknown.length ) { throw Error(`TypeScript.SyntaxKind (unknown) found:${unknown.map(kind => `\n${( ''+SyntaxKind[kind] ).padStart(3, ' ')}\t${kind}\t`).join('')}`); }
 
 require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 	await build({
@@ -25,7 +25,7 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 				'Pure transpiler for TypeScript. Belong to "Plan J".／'+
 				'TypeScript 纯转译工具。从属于“简计划”。',
 			dependencies: {
-				'typescript': '3.5.3',
+				'typescript': '3.8.3',
 			},
 		},
 		ES: 6,

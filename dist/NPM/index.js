@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.0.5';
+const version = '6.1.0';
 
 const undefined$1 = void 0;
 
@@ -81,6 +81,9 @@ const {
 		AbstractKeyword,
 		ThisType,
 		//NamespaceExportDeclaration,
+		ExportDeclaration,
+		ImportDeclaration,
+		ImportClause,
 	},
 } = require('typescript');
 
@@ -90,8 +93,6 @@ const remove = (exp        ) => exp.replace(S, ' ');
 const GT = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*)>/;
 const removeFirstGT = (exp        ) => exp.replace(GT, ' ');
 
-const SHEBANG = /(?<=^\uFEFF?#!.*)/;
-const HASH = /#/g;
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
 
@@ -118,8 +119,8 @@ let childNodes         = [];
                                                                                                                                                   
                                                                                                                                                                                                                                      
 function transpileModule (input        , jsx_transpileOptions                                                            )                                                                                            {
+	ts = input;
 	try {
-		ts = coverHash(input);
 		if ( typeof jsx_transpileOptions==='object' ) {
 			let scriptKind;
 			const { compilerOptions } = jsx_transpileOptions;
@@ -147,13 +148,13 @@ function transpileModule (input        , jsx_transpileOptions                   
 			else { scriptKind = TS; }
 			const { diagnostics } = _transpileModule(ts, jsx_transpileOptions);
 			return {
-				outputText: recoverHash(from(createSourceFile('', ts, ESNext, false, scriptKind))),
+				outputText: from(createSourceFile('', ts, ESNext, false, scriptKind)),
 				diagnostics,
 				sourceMapText: undefined$1,
 			};
 		}
 		else {
-			return recoverHash(from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)));
+			return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS));
 		}
 	}
 	finally {
@@ -161,27 +162,6 @@ function transpileModule (input        , jsx_transpileOptions                   
 		ts = '';
 	}
 }
-function coverHash (origin        ) {
-	const start = origin.search(SHEBANG)+1;
-	let position = start;
-	while ( ( position = origin.indexOf('#', position) )>=0 ) { hashes.push(position++); }
-	return hashes.length ? origin.slice(0, start)+origin.slice(start).replace(HASH, '_') : origin;
-}
-function recoverHash (covered        ) {
-	const { length } = hashes;
-	if ( length ) {
-		const chars = covered.split('');
-		let index = 0;
-		do {
-			const position = hashes[index];
-			if ( chars[position]==='_' ) { chars[position] = '#'; }
-		}
-		while ( ++index!==length )
-		return chars.join('');
-	}
-	return covered;
-}
-
 function childNodes_push (child      ) { childNodes.push(child); }
 function ChildNodes (node      )                  {
 	try {
@@ -245,6 +225,7 @@ function afterColon (node      ) {
 }
 
 function from (node      )         {
+	let ts_index = node.pos;
 	switch ( node.kind ) {
 		//case NamespaceExportDeclaration:
 		case TypeAliasDeclaration:
@@ -256,7 +237,7 @@ function from (node      )         {
 		case PublicKeyword:
 		case IndexSignature:
 		case AbstractKeyword:
-			return remove(ts.slice(node.pos, node.end));
+			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
 			throw Error('enum _ { }');
 		case ImportEqualsDeclaration:
@@ -265,13 +246,29 @@ function from (node      )         {
 	const childNodes = ChildNodes(node);
 	const childNodes_length = childNodes.length;
 	if ( childNodes_length ) {
-		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
-		if ( node.kind===ExportAssignment ) {
-			const { pos } = childNodes[0];
-			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
+		let index = 0;
+		do { if ( childNodes[index].kind===DeclareKeyword ) { return remove(ts.slice(ts_index, node.end)); } }
+		while ( ++index!==childNodes_length )
+		switch ( node.kind ) {
+			case ImportDeclaration:
+				const child = childNodes[0];
+				if ( child.kind===ImportClause ) {
+					const { pos } = ChildNodes(child)[0];
+					if ( pos!==child.pos && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
+				}
+				break;
+			case ExportDeclaration: {
+				const { pos } = childNodes[0];
+				if ( pos!==ts_index && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
+				break;
+			}
+			case ExportAssignment: {
+				const { pos } = childNodes[0];
+				if ( pos!==ts_index && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
+				break;
+			}
 		}
 	}
-	let ts_index = node.pos;
 	const es           = [];
 	switch ( node.kind ) {
 		case TypeAssertionExpression: {

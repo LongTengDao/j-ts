@@ -69,6 +69,9 @@
 ✓	AbstractKeyword	
 	FirstContextualKeyword	(internal)	
 ✓	ThisType	
+✓	ExportDeclaration	
+✓	ImportDeclaration	
+✓	ImportClause	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -259,12 +262,9 @@
 239	VariableDeclarationList	
 246	ModuleBlock	
 247	CaseBlock	
-250	ImportDeclaration	
-251	ImportClause	
 252	NamespaceImport	
 253	NamedImports	
 254	ImportSpecifier	
-256	ExportDeclaration	
 257	NamedExports	
 258	ExportSpecifier	
 259	MissingDeclaration	
@@ -354,3 +354,17 @@
 311	LastJSDocNode	
 300	FirstJSDocTagNode	
 311	LastJSDocTagNode	
+ 28	QuestionDotToken	
+ 60	QuestionQuestionToken	
+ 76	PrivateIdentifier	
+124	AssertsKeyword	
+262	NamespaceExport	
+302	JSDocNamepathType	
+308	JSDocAuthorTag	
+310	JSDocPublicTag	
+311	JSDocPrivateTag	
+312	JSDocProtectedTag	
+313	JSDocReadonlyTag	
+329	SyntheticReferenceExpression	
+225	FirstStatement	
+241	LastStatement	

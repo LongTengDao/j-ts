@@ -78,6 +78,9 @@ const {
 		AbstractKeyword,
 		ThisType,
 		//NamespaceExportDeclaration,
+		ExportDeclaration,
+		ImportDeclaration,
+		ImportClause,
 	},
 } = require('typescript');
 
@@ -87,8 +90,6 @@ const remove = (exp :string) => exp.replace(S, ' ');
 const GT = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*)>/;
 const removeFirstGT = (exp :string) => exp.replace(GT, ' ');
 
-const SHEBANG = /(?<=^\uFEFF?#!.*)/;
-const HASH = /#/g;
 const THIS = /^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*this(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*$/;
 const COMMA = /(?<=^(?:\s+|\/(?:\/.*[\n\r\u2028\u2029]|\*[^]*?\*\/))*),/;
 
@@ -115,8 +116,8 @@ let childNodes :Node[] = [];
 export default function transpileModule (input :string, jsx                 ? :boolean                                                  ) :string;
 export default function transpileModule (input :string,     transpileOptions  :          { compilerOptions? :{ jsx? :number | string } }) :         { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
 export default function transpileModule (input :string, jsx_transpileOptions? :boolean | { compilerOptions? :{ jsx? :number | string } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
+	ts = input;
 	try {
-		ts = coverHash(input);
 		if ( typeof jsx_transpileOptions==='object' ) {
 			let scriptKind;
 			const { compilerOptions } = jsx_transpileOptions;
@@ -144,13 +145,13 @@ export default function transpileModule (input :string, jsx_transpileOptions? :b
 			else { scriptKind = TS; }
 			const { diagnostics } = _transpileModule(ts, jsx_transpileOptions);
 			return {
-				outputText: recoverHash(from(createSourceFile('', ts, ESNext, false, scriptKind))),
+				outputText: from(createSourceFile('', ts, ESNext, false, scriptKind)),
 				diagnostics,
 				sourceMapText: undefined,
 			};
 		}
 		else {
-			return recoverHash(from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)));
+			return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS));
 		}
 	}
 	finally {
@@ -158,27 +159,6 @@ export default function transpileModule (input :string, jsx_transpileOptions? :b
 		ts = '';
 	}
 };
-
-function coverHash (origin :string) {
-	const start = origin.search(SHEBANG)+1;
-	let position = start;
-	while ( ( position = origin.indexOf('#', position) )>=0 ) { hashes.push(position++); }
-	return hashes.length ? origin.slice(0, start)+origin.slice(start).replace(HASH, '_') : origin;
-}
-function recoverHash (covered :string) {
-	const { length } = hashes;
-	if ( length ) {
-		const chars = covered.split('');
-		let index = 0;
-		do {
-			const position = hashes[index];
-			if ( chars[position]==='_' ) { chars[position] = '#'; }
-		}
-		while ( ++index!==length )
-		return chars.join('');
-	}
-	return covered;
-}
 
 function childNodes_push (child :Node) { childNodes.push(child); }
 function ChildNodes (node :Node) :readonly Node[] {
@@ -243,6 +223,7 @@ function afterColon (node :Node) {
 }
 
 function from (node :Node) :string {
+	let ts_index = node.pos;
 	switch ( node.kind ) {
 		//case NamespaceExportDeclaration:
 		case TypeAliasDeclaration:
@@ -254,7 +235,7 @@ function from (node :Node) :string {
 		case PublicKeyword:
 		case IndexSignature:
 		case AbstractKeyword:
-			return remove(ts.slice(node.pos, node.end));
+			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
 			throw Error('enum _ { }');
 		case ImportEqualsDeclaration:
@@ -263,13 +244,29 @@ function from (node :Node) :string {
 	const childNodes = ChildNodes(node);
 	const childNodes_length = childNodes.length;
 	if ( childNodes_length ) {
-		if ( childNodes[0].kind===DeclareKeyword ) { return remove(ts.slice(node.pos, node.end)); }
-		if ( node.kind===ExportAssignment ) {
-			const { pos } = childNodes[0];
-			if ( pos!==node.pos && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
+		let index = 0;
+		do { if ( childNodes[index].kind===DeclareKeyword ) { return remove(ts.slice(ts_index, node.end)); } }
+		while ( ++index!==childNodes_length )
+		switch ( node.kind ) {
+			case ImportDeclaration:
+				const child = childNodes[0];
+				if ( child.kind===ImportClause ) {
+					const { pos } = ChildNodes(child)[0];
+					if ( pos!==child.pos && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
+				}
+				break;
+			case ExportDeclaration: {
+				const { pos } = childNodes[0];
+				if ( pos!==ts_index && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
+				break;
+			}
+			case ExportAssignment: {
+				const { pos } = childNodes[0];
+				if ( pos!==ts_index && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
+				break;
+			}
 		}
 	}
-	let ts_index = node.pos;
 	const es :string[] = [];
 	switch ( node.kind ) {
 		case TypeAssertionExpression: {

@@ -25,7 +25,7 @@ class CLASS                            extends Map                              
 	
 	'property1'     ;
 	property2     = 2 ;
-	[               'property3'                ] = 3 ;
+	[                 'property3'                ] = 3 ;
 	
 	         propertyA ;
 	propertyB   ;
@@ -33,7 +33,7 @@ class CLASS                            extends Map                              
 	
 	static 'property1'     ;
 	static property2     = 2 ;
-	static [               'property3'                ] = 3 ;
+	static [                 'property3'                ] = 3 ;
 	
 	get accessor ( )     { return 1 ; }
 	set 'accessor' ( value     ) { }
@@ -42,7 +42,8 @@ class CLASS                            extends Map                              
 	        PRIVATE;
 	          PROTECTED;
 	
-	#stage3       = '#' ;
+	         #stage3       = '#' ;
+	                                  
 	
 }
 
@@ -80,3 +81,9 @@ function * g () {
 		g ( ) ;
 	return       1 ;
 }
+
+                        
+                      
+                      
+                          
+                           
