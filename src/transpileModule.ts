@@ -81,6 +81,7 @@ const {
 		ExportDeclaration,
 		ImportDeclaration,
 		ImportClause,
+		Constructor,
 	},
 } = require('typescript');
 
@@ -357,6 +358,7 @@ function from (node :Node) :string {
 		case MethodDeclaration:
 		case GetAccessor:
 		case SetAccessor:
+		case Constructor:
 		case FunctionDeclaration: {
 			let declaration = true;
 			let index = 0;

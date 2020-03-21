@@ -12,6 +12,7 @@
 
 class CLASS                            extends Map                                                {
 	
+	                                 
 	constructor (          a ,                 b ,           c = 3 ,         d   ) { super(); }
 	
 	                         

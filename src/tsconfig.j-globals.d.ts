@@ -1,15 +1,14 @@
 
 declare module '.Error' { export default Error; }
 
-declare module '.Object.assign' { export default Object.assign; }
+declare module '.Object.assign?' { export default Object.assign; }
 declare module '.Object.create' { export default create;
 	function create<P extends object | null, D extends TypedPropertyDescriptorMap<object> | void> (proto :P,    descriptorMap? :D) :object & ( D extends TypedPropertyDescriptorMap<infer O> ? O : object ) & ( P extends object ? { [K in keyof P] :P[K] } : object );
 	type TypedPropertyDescriptorMap<O> = { [K in keyof O] :TypedPropertyDescriptor<O[K]> };
 }
 declare module '.Object.defineProperty' { export default Object.defineProperty; }
 declare module '.Object.freeze' { export default Object.freeze; }
-declare module '.Object.prototype.hasOwnProperty' { export default Object.prototype.hasOwnProperty; }
-declare module '.Object.seal' { export default Object.seal; }
+declare module '.Object.getOwnPropertyDescriptor' { export default Object.getOwnPropertyDescriptor; }
 
 declare module '.Symbol.toStringTag?' { export default Symbol.toStringTag; }
 

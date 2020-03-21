@@ -72,6 +72,7 @@
 ✓	ExportDeclaration	
 ✓	ImportDeclaration	
 ✓	ImportClause	
+✓	Constructor	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -208,7 +209,6 @@
 153	Decorator	
 154	PropertySignature	
 156	MethodSignature	
-158	Constructor	
 161	CallSignature	
 162	ConstructSignature	
 164	TypePredicate	

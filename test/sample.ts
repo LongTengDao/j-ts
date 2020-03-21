@@ -12,6 +12,7 @@ abstract class SUPER {
 
 class CLASS < T extends any, U = any > extends Map < any , any > implements INTERFACE , INTERFACE {
 	
+	constructor ( a , b , c , d ? ) ;
 	constructor ( readonly a , public readonly b , protected c = 3 , private d ? ) { super(); }
 	
 	[ name : string ] : any ;

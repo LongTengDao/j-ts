@@ -2,7 +2,7 @@ export = exports;
 
 declare const exports :transpileModule & Readonly<{
 	
-	version :'6.1.0',
+	version :'6.1.1',
 	
 	transpileModule :transpileModule,
 	

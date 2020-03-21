@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.1.0';
+const version = '6.1.1';
 
 const undefined$1 = void 0;
 
@@ -84,6 +84,7 @@ const {
 		ExportDeclaration,
 		ImportDeclaration,
 		ImportClause,
+		Constructor,
 	},
 } = require('typescript');
 
@@ -359,6 +360,7 @@ function from (node      )         {
 		case MethodDeclaration:
 		case GetAccessor:
 		case SetAccessor:
+		case Constructor:
 		case FunctionDeclaration: {
 			let declaration = true;
 			let index = 0;
@@ -516,17 +518,13 @@ function from (node      )         {
 
 const create = Object.create;
 
-const assign = Object.assign;
-
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
 const toStringTag = typeof Symbol!=='undefined' ? Symbol.toStringTag : undefined;
 
 const defineProperty = Object.defineProperty;
 
 const freeze = Object.freeze;
-
-const seal = Object.seal;
 
 const NULL = (
 	/*! j-globals: null.prototype (internal) */
@@ -536,20 +534,22 @@ const NULL = (
 	/*¡ j-globals: null.prototype (internal) */
 );
 
+const assign = typeof Object!=='undefined' ? Object.assign : undefined;
+
 const Default = (
 	/*! j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
 		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
 			if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(NULL); }
 			if ( assign ) { assign(exports, addOnOrigin); }
-			else { for ( var key in addOnOrigin ) { if ( hasOwnProperty.call(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
-			exports['default'] = exports;
-			typeof exports==='function' && exports.prototype && seal(exports.prototype);
+			else { for ( var key in addOnOrigin ) { if ( getOwnPropertyDescriptor(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
+			exports.default = exports;
 			if ( toStringTag ) {
 				var descriptor = create(NULL);
 				descriptor.value = 'Module';
 				defineProperty(exports, toStringTag, descriptor);
 			}
+			typeof exports==='function' && exports.prototype && freeze(exports.prototype);
 			return freeze(exports);
 		}(exports, addOnOrigin);
 	}
