@@ -2,13 +2,21 @@
 
 const EOL = /\r\n?|[\n\u2028\u2029]/;
 
-module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import_default, get, put }) {
+module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import_default, get, put, ful }) {
 	const transpileModule = await import_default('src/default', {
 		require: [ 'typescript' ],
 		ES: 6,
 	});
 	const sample = await get('test/sample.ts');
-	const output = transpileModule(sample);
+	let output;
+	try { output = transpileModule(sample); }
+	catch (posError) {
+		if ( typeof posError.pos==='number' ) {
+			const before = sample.slice(0, posError.pos).split(/\r\n?|[\n\u2028\u2029]/);
+			posError.message += `\n    at (${ful('test/sample.ts')}:${before.length}:${before[before.length - 1].length + 1})`;
+		}
+		throw posError;
+	}
 	const expect = await get('test/expect.js');
 	if ( output!==expect ) {
 		await put('test/output#.js', output);

@@ -13,7 +13,7 @@
 class CLASS                            extends Map                                                {
 	
 	                                 
-	constructor (          a ,                 b ,           c = 3 ,         d   ) { super(); }
+	constructor ( a , b , c = 3 , d   ) { super(); }
 	
 	                         
 	                          
@@ -45,6 +45,8 @@ class CLASS                            extends Map                              
 	
 	         #stage3       = '#' ;
 	                                  
+	
+	non       ;
 	
 }
 
@@ -88,3 +90,10 @@ function * g () {
                       
                           
                            
+
+Array ?. (       1 ) ;
+Array ?.       (       1 ) ;
+
+try { } catch ( e           ) { }
+
+class X extends ( Array )       { }

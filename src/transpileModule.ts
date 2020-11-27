@@ -2,7 +2,7 @@ import Error from '.Error';
 import undefined from '.undefined';
 
 const {
-	transpileModule: _transpileModule,
+	transpileModule: TypeScript_transpileModule,
 	createSourceFile,
 	forEachChild,
 	JsxEmit: { None, Preserve, React, ReactNative },
@@ -13,7 +13,6 @@ const {
 		TypeAssertionExpression,
 		AsExpression,
 		HeritageClause,
-		Identifier,
 		FunctionExpression,
 		FunctionDeclaration,
 		ClassDeclaration,
@@ -82,8 +81,15 @@ const {
 		ImportDeclaration,
 		ImportClause,
 		Constructor,
+		ExclamationToken,
+		ExpressionWithTypeArguments,
 	},
 } = require('typescript');
+
+const throwPos = (pos :number, error :Error & { pos? :number }) :never => {
+	error.pos = pos;
+	throw error;
+};
 
 const S = /\S/g;
 const remove = (exp :string) => exp.replace(S, ' ');
@@ -100,89 +106,21 @@ const STRUCTURE = {
 	[ReturnStatement]: 'return',
 	[ThrowStatement]: 'throw',
 	[YieldExpression]: 'yield',
-};
-function EOL_VALUE_test (literal :string) {
-	for ( ; ; ) {
-		const index = literal.search(WHITE);
-		if ( index<0 ) { return false; }
-		if ( EOL.test(literal.slice(0, index)) ) { return true; }
-		literal = literal.slice(index);
-	}
-}
+} as const;
 
-const hashes :number[] = [];
 let ts :string = '';
 let childNodes :Node[] = [];
 
-export default function transpileModule (input :string, jsx                 ? :boolean                                                  ) :string;
-export default function transpileModule (input :string,     transpileOptions  :          { compilerOptions? :{ jsx? :number | string } }) :         { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined };
-export default function transpileModule (input :string, jsx_transpileOptions? :boolean | { compilerOptions? :{ jsx? :number | string } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } {
-	ts = input;
-	try {
-		if ( typeof jsx_transpileOptions==='object' ) {
-			let scriptKind;
-			const { compilerOptions } = jsx_transpileOptions;
-			if ( compilerOptions ) {
-				const { jsx } = compilerOptions;
-				switch ( jsx ) {
-					case undefined:
-					case None:
-					case 'None':
-						scriptKind = TS;
-						break;
-					case Preserve:
-					case ReactNative:
-					case 'Preserve':
-					case 'ReactNative':
-						scriptKind = TSX;
-						break;
-					case React:
-					case 'React':
-						throw Error('transpileModule(,{ compilerOptions: { jsx: React } })');
-					default:
-						throw Error('transpileModule(,{ compilerOptions: { jsx! } })');
-				}
-			}
-			else { scriptKind = TS; }
-			const { diagnostics } = _transpileModule(ts, jsx_transpileOptions);
-			return {
-				outputText: from(createSourceFile('', ts, ESNext, false, scriptKind)),
-				diagnostics,
-				sourceMapText: undefined,
-			};
-		}
-		else {
-			return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS));
-		}
-	}
-	finally {
-		hashes.length = 0;
-		ts = '';
-	}
-};
-
-function childNodes_push (child :Node) { childNodes.push(child); }
-function ChildNodes (node :Node) :readonly Node[] {
+const childNodes_push = (child :Node) => { childNodes[childNodes.length] = child; };
+const ChildNodes = (node :Node) :readonly Node[] => {
 	try {
 		forEachChild(node, childNodes_push);
 		return childNodes;
 	}
 	finally { childNodes = []; }
-}
-function Children (childNodes :readonly Node[], ts_index :number, node_end :number) :readonly ( Node | string )[] {
-	const children = [];
-	let index = 0;
-	for ( const { length } = childNodes; index!==length; ++index ) {
-		const child = childNodes[index];
-		if ( ts_index!==child.pos ) { children.push(ts.slice(ts_index, child.pos)); }
-		children.push(child);
-		ts_index = child.end;
-	}
-	if ( ts_index!==node_end ) { children.push(ts.slice(ts_index, node_end)); }
-	return children;
-}
+};
 
-function afterColon (node :Node) {
+const afterColon = (node :Node) => {
 	switch ( node.kind ) {
 		case ParenthesizedType:
 		case IndexedAccessType:
@@ -221,9 +159,9 @@ function afterColon (node :Node) {
 			return ts.endsWith(':', node.pos);
 	}
 	return false;
-}
+};
 
-function from (node :Node) :string {
+const from = (node :Node) :string => {
 	let ts_index = node.pos;
 	switch ( node.kind ) {
 		//case NamespaceExportDeclaration:
@@ -238,32 +176,32 @@ function from (node :Node) :string {
 		case AbstractKeyword:
 			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
-			throw Error('enum _ { }');
+			throwPos(ChildNodes(node)[0]!.pos - 4, Error('enum'));
 		case ImportEqualsDeclaration:
-			throw Error('import _ = require( );');
+			throwPos(ChildNodes(node)[1]!.pos - 1, Error('import='));
 	}
 	const childNodes = ChildNodes(node);
 	const childNodes_length = childNodes.length;
 	if ( childNodes_length ) {
 		let index = 0;
-		do { if ( childNodes[index].kind===DeclareKeyword ) { return remove(ts.slice(ts_index, node.end)); } }
-		while ( ++index!==childNodes_length )
+		do { if ( childNodes[index]!.kind===DeclareKeyword ) { return remove(ts.slice(ts_index, node.end)); } }
+		while ( ++index!==childNodes_length );
 		switch ( node.kind ) {
 			case ImportDeclaration:
-				const child = childNodes[0];
+				const child = childNodes[0]!;
 				if ( child.kind===ImportClause ) {
-					const { pos } = ChildNodes(child)[0];
+					const { pos } = ChildNodes(child)[0]!;
 					if ( pos!==child.pos && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
 				}
 				break;
 			case ExportDeclaration: {
-				const { pos } = childNodes[0];
+				const { pos } = childNodes[0]!;
 				if ( pos!==ts_index && ts.endsWith('type', pos) ) { return remove(ts.slice(ts_index, node.end)); }
 				break;
 			}
 			case ExportAssignment: {
-				const { pos } = childNodes[0];
-				if ( pos!==ts_index && ts.endsWith('=', pos) ) { throw Error('export = _;'); }
+				const { pos } = childNodes[0]!;
+				if ( pos!==ts_index && ts.endsWith('=', pos) ) { throwPos(pos - 1, Error('export=')); }
 				break;
 			}
 		}
@@ -271,87 +209,74 @@ function from (node :Node) :string {
 	const es :string[] = [];
 	switch ( node.kind ) {
 		case TypeAssertionExpression: {
-			if ( childNodes_length!==2 ) { throw Error(''+childNodes_length); }
-			const { pos, end } = childNodes[0];
-			es.push(
-				ts.slice(ts_index, pos-1)+remove(ts.slice(pos-1, end))
-				+
-				ts.slice(end, childNodes[1].pos-1)+' '+from(childNodes[1])
-			);
+			if ( childNodes_length!==2 ) { throw Error('TypeAssertionExpression ' + childNodes_length); }
+			const { pos, end } = childNodes[0]!;
+			es[es.length] = ts.slice(ts_index, pos - 1) + remove(ts.slice(pos - 1, end)) + ts.slice(end, childNodes[1]!.pos - 1) + ' ' + from(childNodes[1]!);
 			break;
 		}
 		case AsExpression: {
-			if ( childNodes_length!==2 ) { throw Error(''+childNodes_length); }
-			const { pos, end } = childNodes[1];
-			es.push(
-				from(childNodes[0])
-				+
-				ts.slice(childNodes[0].end, pos-2)+remove(ts.slice(pos-2, end))
-			);
+			if ( childNodes_length!==2 ) { throw Error('AsExpression ' + childNodes_length); }
+			const { pos, end } = childNodes[1]!;
+			es[es.length] = from(childNodes[0]!) + ts.slice(childNodes[0]!.end, pos - 2) + remove(ts.slice(pos - 2, end));
 			break;
 		}
 		case HeritageClause: {
 			let i = false;
-			if ( !childNodes_length ) { throw Error(''+childNodes_length); }
+			if ( !childNodes_length ) { throw Error('HeritageClause ' + childNodes_length); }
 			let index = 0;
-			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
+			do {
+				const child = childNodes[index++]!;
 				if ( es.length ) {
-					if ( i ) {
-						es.push(remove(ts.slice(ts_index, child.end)));
-						ts_index = child.end;
-					}
-					else { throw Error(''+es.length); }
+					if ( !i ) { throw Error('HeritageClause ' + es.length); }
+					es[es.length] = remove(ts.slice(ts_index, child.end));
 				}
 				else {
-					i = ts.endsWith('implements', child.pos);
-					if ( i ) {
-						es.push(ts.slice(ts_index, child.pos-10)+remove(ts.slice(child.pos-10, child.end)));
-						ts_index = child.end;
-					}
-					else {
-						es.push(ts.slice(ts_index, ts_index = child.pos));
-						const children :( Node | number )[] = [];
-						forEachChild(child, (child :Node) => {
-							if ( ts_index!==child.pos ) { children.push(child.pos); }
-							children.push(child);
-							ts_index = child.end;
-						});
-						es.push(
-							children.length>1 && ( children[0] as Node ).kind===Identifier
-								? ts.slice(( children[0] as Node ).pos, ( children[1] as number )-1)+remove(ts.slice(( children[1] as number )-1, child.end))
-								: from(child)
-						);
-					}
+					es[es.length] = ( i = ts.endsWith('implements', child.pos) )
+						? ts.slice(ts_index, child.pos - 10) + remove(ts.slice(child.pos - 10, child.end))
+						: ts.slice(ts_index, child.pos) + from(child);
 				}
+				ts_index = child.end;
 			}
+			while ( index!==childNodes_length );
 			break;
 		}
 		case CallExpression:
 		case NewExpression: {
-			const children = Children(childNodes, ts_index, /*ts_index = */node.end);
+			const children = [];
 			let index = 0;
-			if ( node.kind===NewExpression ) { es.push(children[index++] as string); }
-			es.push(from(children[index++] as Node));
+			for ( const { length } = childNodes; index!==length; ++index ) {
+				const child = childNodes[index]!;
+				if ( ts_index!==child.pos ) { children[children.length] = ts.slice(ts_index, child.pos); }
+				children[children.length] = child;
+				ts_index = child.end;
+			}
+			if ( ts_index!==node.end ) { children[children.length] = ts.slice(ts_index, node.end); }//ts_index = node.end;
+			index = 0;
+			if ( node.kind===NewExpression ) { es[es.length] = children[index++] as string; }
+			es[es.length] = from(children[index++] as Node);
 			const { length } = children;
 			if ( index===length ) { break; }
+			if ( typeof children[index]==='object' ) {
+				es[es.length] = from(children[index++] as Node);
+				if ( index===length ) { break; }
+			}
 			if ( ( children[index] as string ).endsWith('<') ) {
-				es.push(( children[index++] as string ).slice(0, -1)+' ');
+				es[es.length] = ( children[index++] as string ).slice(0, -1) + ' ';
 				while ( index!==length ) {
-					const child = children[index++];
+					const child = children[index++]!;
 					if ( typeof child==='string' ) {
 						if ( GT.test(child) ) {
-							es.push(removeFirstGT(child));
+							es[es.length] = removeFirstGT(child);
 							break;
 						}
-						else { es.push(remove(child)); }
+						else { es[es.length] = remove(child); }
 					}
-					else { es.push(remove(ts.slice(child.pos, child.end))); }
+					else { es[es.length] = remove(ts.slice(child.pos, child.end)); }
 				}
 			}
 			while ( index!==length ) {
-				const child = children[index++];
-				es.push(typeof child==='string' ? child : from(child));
+				const child = children[index++]!;
+				es[es.length] = typeof child==='string' ? child : from(child);
 			}
 			break;
 		}
@@ -363,7 +288,7 @@ function from (node :Node) :string {
 			let declaration = true;
 			let index = 0;
 			for ( ; index!==childNodes_length; ++index ) {
-				if ( childNodes[index].kind===Block ) {
+				if ( childNodes[index]!.kind===Block ) {
 					declaration = false;
 					break;
 				}
@@ -373,14 +298,14 @@ function from (node :Node) :string {
 		case FunctionExpression: {
 			let index = 0;
 			for ( ; index!==childNodes_length; ++index ) {
-				const child = childNodes[index];
+				const child = childNodes[index]!;
 				if ( child.kind===Parameter ) {
 					const maybeThis = from(child);
 					if ( THIS.test(maybeThis) ) {
 						child.kind = TypeAliasDeclaration;
 						const { end } = child;
-						const indexAfterComma = ts.slice(end, childNodes[index+1].pos).search(COMMA)+1;
-						if ( indexAfterComma ) { child.end = end+indexAfterComma; }
+						const indexAfterComma = ts.slice(end, childNodes[index + 1]!.pos).search(COMMA) + 1;
+						if ( indexAfterComma ) { child.end = end + indexAfterComma; }
 					}
 					break;
 				}
@@ -392,75 +317,96 @@ function from (node :Node) :string {
 			let gt = false;
 			let index = 0;
 			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
+				const child = childNodes[index++]!;
 				if ( child.kind===TypeParameter ) {
-					if ( gt ) { es.push(remove(ts.slice(ts_index, child.end))); }
+					if ( gt ) { es[es.length] = remove(ts.slice(ts_index, child.end)); }
 					else {
-						es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end)));
+						es[es.length] = ts.slice(ts_index, child.pos - 1) + remove(ts.slice(child.pos - 1, child.end));
 						gt = true;
 					}
 				}
 				else if ( afterColon(child) ) {
 					if ( gt ) {
 						gt = false;
-						es.push(removeFirstGT(ts.slice(ts_index, child.pos-1))+' ');
+						es[es.length] = removeFirstGT(ts.slice(ts_index, child.pos - 1)) + ' ';
 					}
-					else { es.push(ts.slice(ts_index, child.pos-1)+' '); }
-					es.push(remove(ts.slice(child.pos, child.end)));
+					else { es[es.length] = ts.slice(ts_index, child.pos - 1) + ' '; }
+					es[es.length] = remove(ts.slice(child.pos, child.end));
 				}
 				else {
 					if ( gt ) {
 						gt = false;
-						es.push(removeFirstGT(ts.slice(ts_index, child.pos)));
+						es[es.length] = removeFirstGT(ts.slice(ts_index, child.pos));
 					}
-					else if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-					es.push(child.kind===QuestionToken && node.kind===MethodDeclaration
-						? ts.slice(ts_index, child.end-1)+' '
-						: from(child)
-					);
+					else if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+					es[es.length] = child.kind===QuestionToken && node.kind===MethodDeclaration
+						? ts.slice(ts_index, child.end - 1) + ' '
+						: from(child);
 				}
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 			break;
 		}
 		case VariableDeclaration: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
-				if ( ts_index===child.pos ) { es.push(from(child)); }
-				else if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
-				else { es.push(ts.slice(ts_index, child.pos)+from(child)); }
+				const child = childNodes[index++]!;
+				if ( ts_index===child.pos ) { es[es.length] = from(child); }
+				else if ( afterColon(child) ) { es[es.length] = ts.slice(ts_index, child.pos - 1) + remove(ts.slice(child.pos - 1, child.end)); }
+				else { es[es.length] = ts.slice(ts_index, child.pos) + from(child); }
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 			break;
 		}
-		case PropertyDeclaration:
-		case Parameter: {
+		case PropertyDeclaration: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
-				if ( afterColon(child) ) { es.push(ts.slice(ts_index, child.pos-1)+remove(ts.slice(child.pos-1, child.end))); }
-				else if ( child.kind===QuestionToken ) { es.push(ts.slice(ts_index, child.end-1)+' '); }
+				const child = childNodes[index++]!;
+				if ( afterColon(child) ) { es[es.length] = ts.slice(ts_index, child.pos - 1) + remove(ts.slice(child.pos - 1, child.end)); }
+				else if ( child.kind===QuestionToken || child.kind===ExclamationToken ) { es[es.length] = ts.slice(ts_index, child.end - 1) + ' '; }
 				else {
-					if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-					es.push(from(child));
+					if ( child.kind===AbstractKeyword ) { throwPos(child.end - 8, Error('abstract field expect declare')); }
+					if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+					es[es.length] = from(child);
 				}
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
+			break;
+		}
+		case Parameter: {
+			let index = 0;
+			while ( index!==childNodes_length ) {
+				const child = childNodes[index++]!;
+				if ( afterColon(child) ) { es[es.length] = ts.slice(ts_index, child.pos - 1) + remove(ts.slice(child.pos - 1, child.end)); }
+				else {
+					const { kind } = child;
+					if ( kind===QuestionToken ) { es[es.length] = ts.slice(ts_index, child.end - 1) + ' '; }
+					else if ( kind===ReadonlyKeyword ) { throwPos(child.end - 8, Error('parameter property is not supported (readonly)')); }
+					else if ( kind===PublicKeyword ) { throwPos(child.end - 6, Error('parameter property is not supported (public)')); }
+					else if ( kind===ProtectedKeyword ) { throwPos(child.end - 9, Error('parameter property is not supported (protected)')); }
+					else if ( kind===PrivateKeyword ) { throwPos(child.end - 7, Error('parameter property is not supported (private)')); }
+					else {
+						if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+						es[es.length] = from(child);
+					}
+				}
+				ts_index = child.end;
+			}
+			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 			break;
 		}
 		case NonNullExpression: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
-				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-				es.push(from(child));
+				const child = childNodes[index++]!;
+				if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+				es[es.length] = from(child);
 				ts_index = child.end;
 			}
-			es.push(ts.slice(ts_index, node.end-1)+' ');
+			es[es.length] = ts.slice(ts_index, node.end - 1) + ' ';
 			break;
 		}
 		case ReturnStatement:
@@ -468,50 +414,100 @@ function from (node :Node) :string {
 		case YieldExpression:
 			switch ( childNodes_length ) {
 				case 0:
-					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 					break;
 				case 1:
-					const child = childNodes[0];
+					const child = childNodes[0]!;
 					if ( child.kind===TypeAssertionExpression ) {
 						const { 0: type, 1: value } = ChildNodes(child);
-						if ( EOL.test(ts.slice(type.pos, value.pos)) ) { throw Error(`${STRUCTURE[node.kind]} <type (EOL)> value`); }
-						if ( EOL_VALUE_test(from(value)) ) { throw Error(`${STRUCTURE[node.kind]} <type> (EOL) value`); }
+						const index = ts.slice(type!.pos, value!.pos).search(EOL);
+						if ( index>=0 ) { throwPos(type!.pos + index, Error(STRUCTURE[node.kind] + ' <type (EOL)> value')); }
+						let literal :string = from(value!);
+						let offset :number = 0;
+						for ( ; ; ) {
+							const index = literal.search(WHITE);
+							if ( index<0 ) { break; }
+							if ( EOL.test(literal.slice(0, index)) ) { throwPos(value!.pos + offset + literal.search(EOL), Error(STRUCTURE[node.kind] + ' <type> (EOL) value')); }
+							literal = literal.slice(index);
+							offset += index;
+						}
 					}
-					if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-					es.push(from(child));
+					if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+					es[es.length] = from(child);
 					ts_index = child.end;
-					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 					break;
 				case 2:
 					let index = 0;
 					while ( index!==childNodes_length ) {
-						const child = childNodes[index++];
-						if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-						es.push(from(child));
+						const child = childNodes[index++]!;
+						if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+						es[es.length] = from(child);
 						ts_index = child.end;
 					}
-					if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+					if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 					break;
 				default:
-					throw Error(''+childNodes_length);
+					throw Error(node.kind + ' ' + childNodes_length);
 			}
 			break;
+		case ExpressionWithTypeArguments:
+			if ( childNodes_length<2 ) { throw Error('ExpressionWithTypeArguments ' + childNodes_length); }
+			es[es.length] = from(childNodes[0]!) + remove(ts.slice(childNodes[0]!.end, node.end));
+			break;
 		case EndOfFileToken:
-			if ( node.pos!==node.end ) { es.push(ts.slice(node.pos, node.end)); }
+			if ( node.pos!==node.end ) { es[es.length] = ts.slice(node.pos, node.end); }
 			break;
 		default: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
-				const child = childNodes[index++];
-				if ( ts_index!==child.pos ) { es.push(ts.slice(ts_index, child.pos)); }
-				es.push(from(child));
+				const child = childNodes[index++]!;
+				if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
+				es[es.length] = from(child);
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es.push(ts.slice(ts_index, node.end)); }
+			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
 			break;
 		}
 	}
 	return es.join('');
-}
+};
+
+const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compilerOptions :{ jsx? :number | 'None' | 'Preserve' | 'ReactNative' } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } => {
+	ts = input;
+	try {
+		if ( typeof jsx_transpileOptions==='object' ) {
+			let scriptKind;
+			switch ( jsx_transpileOptions.compilerOptions.jsx ) {
+				case undefined:
+				case None:
+				case 'None':
+					scriptKind = TS;
+					break;
+				case Preserve:
+				case ReactNative:
+				case 'Preserve':
+				case 'ReactNative':
+					scriptKind = TSX;
+					break;
+				case React:
+				case 'React':
+					throw Error('transpileModule(,{compilerOptions:{jsx:React}})');
+				default:
+					throw Error('transpileModule(,{compilerOptions:{jsx:unknown}})');
+			}
+			const { diagnostics } = TypeScript_transpileModule(ts, jsx_transpileOptions);
+			return {
+				outputText: from(createSourceFile('', ts, ESNext, false, scriptKind)),
+				diagnostics,
+				sourceMapText: undefined,
+			};
+		}
+		else { return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)); }
+	}
+	finally { ts = ''; }
+};
+
+export { transpileModule as default };
 
 type Node = { kind :number, readonly pos :number, end :number };

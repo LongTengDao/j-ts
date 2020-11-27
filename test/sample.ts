@@ -13,7 +13,7 @@ abstract class SUPER {
 class CLASS < T extends any, U = any > extends Map < any , any > implements INTERFACE , INTERFACE {
 	
 	constructor ( a , b , c , d ? ) ;
-	constructor ( readonly a , public readonly b , protected c = 3 , private d ? ) { super(); }
+	constructor ( a , b , c = 3 , d ? ) { super(); }
 	
 	[ name : string ] : any ;
 	[ index : number ] : any ;
@@ -45,6 +45,8 @@ class CLASS < T extends any, U = any > extends Map < any , any > implements INTE
 	
 	readonly #stage3 : '#' = '#' ;
 	readonly declare '[[set]]' : 3.8 ;
+	
+	non ! : 0 ;
 	
 }
 
@@ -88,3 +90,10 @@ export type { CLASS };
 import type A from '';
 import type { B } from '';
 import type * as C from '';
+
+Array ?. ( < 1 > 1 ) ;
+Array ?. < 1 > ( < 1 > 1 ) ;
+
+try { } catch ( e : unknown ) { }
+
+class X extends ( Array ) < 1 > { }

@@ -31,6 +31,9 @@ npm install @ltd/j-ts
 	
 ```
 
+(The error thrown will have a `pos :number` property if possible.)  
+（抛出错误时，会尽量带上 `pos :number` 属性。）  
+
 ### `require('typescript').transpileModule(input :string, options :{}).outputText`
 
 ```JavaScript
@@ -44,10 +47,12 @@ function* f(v) {
 
 |                                                             | `typescript` | `@ltd/j-ts`  |                 <kbd>Alt</kbd>                  |
 |-------------------------------------------------------------|:------------:|:------------:|-------------------------------------------------|
+| `public` / `protected` / `private` / `readonly` parameter   |      ✓      |      ✗      | field                                           |
 | `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                                           |
-| `enum c { }`                                                |      ✓      |      ✗      | `import * as c from '';`                        |
-| `import f = require('');`                                   |      ✓      |      ✗      | `var f = require('');`                          |
-| `export = f;`                                               |      ✓      |      ✗      | `module.exports = f;`                           |
+| `enum $ { }`                                                |      ✓      |      ✗      | `import * as $ from '';`                        |
+| `import $ = require('');`                                   |      ✓      |      ✗      | `var $ :typeof import('') = require('');`       |
+| `export = $;`                                               |      ✓      |      ✗      | `module.exports = $;`                           |
+| jsx: React                                                  |      ✓      |      ✗      | Babel / ...                                     |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------

@@ -23,9 +23,9 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 		NPM: {
 			description:
 				'Pure transpiler for TypeScript. Belong to "Plan J".／'+
-				'TypeScript 纯转译工具。从属于“简计划”。',
+				'TypeScript 纯转译工具。从属于“简计划”。',
 			dependencies: {
-				'typescript': '3.8.3',
+				'typescript': '4.1.2',
 			},
 		},
 		ES: 6,

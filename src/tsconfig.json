@@ -3,6 +3,7 @@
 		"target": "ESNext",
 		"strict": true,
 		"noImplicitReturns": true,
-		"noUnusedLocals": true
+		"noUnusedLocals": true,
+		"noUncheckedIndexedAccess": true
 	}
 }

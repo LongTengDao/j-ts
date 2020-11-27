@@ -67,12 +67,14 @@
 ✓	ConstructorType	
 ✓	IndexSignature	
 ✓	AbstractKeyword	
-	FirstContextualKeyword	(internal)	
+	FirstContextualKeyword	(internal)
 ✓	ThisType	
 ✓	ExportDeclaration	
 ✓	ImportDeclaration	
 ✓	ImportClause	
 ✓	Constructor	
+✓	ExclamationToken	
+✓	ExpressionWithTypeArguments	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -125,7 +127,6 @@
 049	AmpersandToken	
 050	BarToken	
 051	CaretToken	
-052	ExclamationToken	
 053	TildeToken	
 054	AmpersandAmpersandToken	
 055	BarBarToken	
@@ -238,7 +239,6 @@
 207	TemplateExpression	
 209	SpreadElement	
 211	OmittedExpression	
-212	ExpressionWithTypeArguments	
 215	MetaProperty	
 216	SyntheticExpression	
 217	TemplateSpan	
@@ -367,4 +367,17 @@
 313	JSDocReadonlyTag	
 329	SyntheticReferenceExpression	
 225	FirstStatement	
-241	LastStatement	
+241	LastStatement
+308	JSDocImplementsTag	
+—		
+ 74	BarBarEqualsToken	
+ 75	AmpersandAmpersandEqualsToken	
+ 76	QuestionQuestionEqualsToken	
+191	NamedTupleMember	
+314	JSDocDeprecatedTag	
+—		
+136	IntrinsicKeyword	
+193	TemplateLiteralType	
+194	TemplateLiteralTypeSpan	
+302	JSDocNameReference	
+332	JSDocSeeTag	
