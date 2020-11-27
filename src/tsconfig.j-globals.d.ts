@@ -48,6 +48,8 @@ declare module '.String.fromCharCode' { export default String.fromCharCode; }
 declare module '.Symbol.species?' { export default Symbol.species; }
 declare module '.Symbol.toStringTag?' { export default Symbol.toStringTag; }
 
+declare module '.TypeError' { export default TypeError; }
+
 declare module '.class.isPrimitive' { export default isPrimitive;
 	function isPrimitive<T> (value :T) :T extends object ? false : true;
 }

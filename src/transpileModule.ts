@@ -1,4 +1,5 @@
 import Error from '.Error';
+import TypeError from '.TypeError';
 import undefined from '.undefined';
 
 const {
@@ -211,13 +212,12 @@ const from = (node :Node) :string => {
 		case TypeAssertionExpression: {
 			if ( childNodes_length!==2 ) { throw Error('TypeAssertionExpression ' + childNodes_length); }
 			const { pos, end } = childNodes[0]!;
-			es[es.length] = ts.slice(ts_index, pos - 1) + remove(ts.slice(pos - 1, end)) + ts.slice(end, childNodes[1]!.pos - 1) + ' ' + from(childNodes[1]!);
-			break;
+			return ts.slice(ts_index, pos - 1) + remove(ts.slice(pos - 1, end)) + ts.slice(end, childNodes[1]!.pos - 1) + ' ' + from(childNodes[1]!);
 		}
 		case AsExpression: {
 			if ( childNodes_length!==2 ) { throw Error('AsExpression ' + childNodes_length); }
 			const { pos, end } = childNodes[1]!;
-			es[es.length] = from(childNodes[0]!) + ts.slice(childNodes[0]!.end, pos - 2) + remove(ts.slice(pos - 2, end));
+			return from(childNodes[0]!) + ts.slice(childNodes[0]!.end, pos - 2) + remove(ts.slice(pos - 2, end));
 			break;
 		}
 		case HeritageClause: {
@@ -451,13 +451,12 @@ const from = (node :Node) :string => {
 					throw Error(node.kind + ' ' + childNodes_length);
 			}
 			break;
-		case ExpressionWithTypeArguments:
-			if ( childNodes_length<2 ) { throw Error('ExpressionWithTypeArguments ' + childNodes_length); }
-			es[es.length] = from(childNodes[0]!) + remove(ts.slice(childNodes[0]!.end, node.end));
-			break;
+		case ExpressionWithTypeArguments: {
+			const child = childNodes[0]!;
+			return from(child) + remove(ts.slice(child.end, node.end));
+		}
 		case EndOfFileToken:
-			if ( node.pos!==node.end ) { es[es.length] = ts.slice(node.pos, node.end); }
-			break;
+			return node.pos===node.end ? '' : ts.slice(node.pos, node.end);
 		default: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
@@ -492,9 +491,9 @@ const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compi
 					break;
 				case React:
 				case 'React':
-					throw Error('transpileModule(,{compilerOptions:{jsx:React}})');
+					throw TypeError('transpileModule(,{compilerOptions:{jsx:React}})');
 				default:
-					throw Error('transpileModule(,{compilerOptions:{jsx:unknown}})');
+					throw TypeError('transpileModule(,{compilerOptions:{jsx:unknown}})');
 			}
 			const { diagnostics } = TypeScript_transpileModule(ts, jsx_transpileOptions);
 			return {

@@ -1,8 +1,10 @@
 ﻿'use strict';
 
-const version = '6.2.1';
+const version = '6.2.2';
 
 const Error$1 = Error;
+
+const TypeError$1 = TypeError;
 
 const undefined$1 = void 0;
 
@@ -216,14 +218,12 @@ const from = (node      )         => {
 		case TypeAssertionExpression: {
 			if ( childNodes_length!==2 ) { throw Error$1('TypeAssertionExpression ' + childNodes_length); }
 			const { pos, end } = childNodes[0] ;
-			es[es.length] = ts.slice(ts_index, pos - 1) + remove(ts.slice(pos - 1, end)) + ts.slice(end, childNodes[1] .pos - 1) + ' ' + from(childNodes[1] );
-			break;
+			return ts.slice(ts_index, pos - 1) + remove(ts.slice(pos - 1, end)) + ts.slice(end, childNodes[1] .pos - 1) + ' ' + from(childNodes[1] );
 		}
 		case AsExpression: {
 			if ( childNodes_length!==2 ) { throw Error$1('AsExpression ' + childNodes_length); }
 			const { pos, end } = childNodes[1] ;
-			es[es.length] = from(childNodes[0] ) + ts.slice(childNodes[0] .end, pos - 2) + remove(ts.slice(pos - 2, end));
-			break;
+			return from(childNodes[0] ) + ts.slice(childNodes[0] .end, pos - 2) + remove(ts.slice(pos - 2, end));
 		}
 		case HeritageClause: {
 			let i = false;
@@ -456,13 +456,12 @@ const from = (node      )         => {
 					throw Error$1(node.kind + ' ' + childNodes_length);
 			}
 			break;
-		case ExpressionWithTypeArguments:
-			if ( childNodes_length<2 ) { throw Error$1('ExpressionWithTypeArguments ' + childNodes_length); }
-			es[es.length] = from(childNodes[0] ) + remove(ts.slice(childNodes[0] .end, node.end));
-			break;
+		case ExpressionWithTypeArguments: {
+			const child = childNodes[0] ;
+			return from(child) + remove(ts.slice(child.end, node.end));
+		}
 		case EndOfFileToken:
-			if ( node.pos!==node.end ) { es[es.length] = ts.slice(node.pos, node.end); }
-			break;
+			return node.pos===node.end ? '' : ts.slice(node.pos, node.end);
 		default: {
 			let index = 0;
 			while ( index!==childNodes_length ) {
@@ -497,9 +496,9 @@ const transpileModule = (input        , jsx_transpileOptions                    
 					break;
 				case React:
 				case 'React':
-					throw Error$1('transpileModule(,{compilerOptions:{jsx:React}})');
+					throw TypeError$1('transpileModule(,{compilerOptions:{jsx:React}})');
 				default:
-					throw Error$1('transpileModule(,{compilerOptions:{jsx:unknown}})');
+					throw TypeError$1('transpileModule(,{compilerOptions:{jsx:unknown}})');
 			}
 			const { diagnostics } = TypeScript_transpileModule(ts, jsx_transpileOptions);
 			return {
