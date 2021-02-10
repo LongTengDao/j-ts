@@ -97,3 +97,7 @@ Array ?.       (       1 ) ;
 try { } catch ( e           ) { }
 
 class X extends ( Array )       { }
+
+(     (t     ) => {} )     ``;
+
+class Name       {}

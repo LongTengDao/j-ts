@@ -97,3 +97,7 @@ Array ?. < 1 > ( < 1 > 1 ) ;
 try { } catch ( e : unknown ) { }
 
 class X extends ( Array ) < 1 > { }
+
+( <T> (t :any) => {} ) <1> ``;
+
+class Name < T > {}

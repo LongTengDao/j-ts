@@ -75,6 +75,7 @@
 ✓	Constructor	
 ✓	ExclamationToken	
 ✓	ExpressionWithTypeArguments	
+✓	TaggedTemplateExpression	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -226,7 +227,6 @@
 189	ObjectLiteralExpression	
 190	PropertyAccessExpression	
 191	ElementAccessExpression	
-194	TaggedTemplateExpression	
 196	ParenthesizedExpression	
 199	DeleteExpression	
 200	TypeOfExpression	

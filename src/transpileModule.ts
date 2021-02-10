@@ -84,6 +84,7 @@ const {
 		Constructor,
 		ExclamationToken,
 		ExpressionWithTypeArguments,
+		TaggedTemplateExpression,
 	},
 } = require('typescript');
 
@@ -241,7 +242,8 @@ const from = (node :Node) :string => {
 			break;
 		}
 		case CallExpression:
-		case NewExpression: {
+		case NewExpression:
+		case TaggedTemplateExpression: {
 			const children = [];
 			let index = 0;
 			for ( const { length } = childNodes; index!==length; ++index ) {
@@ -345,7 +347,11 @@ const from = (node :Node) :string => {
 				}
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
+			if ( ts_index!==node.end ) {
+				es[es.length] = gt
+					? removeFirstGT(ts.slice(ts_index, node.end))
+					: ts.slice(ts_index, node.end);
+			}
 			break;
 		}
 		case VariableDeclaration: {

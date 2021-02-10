@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.2.2';
+const version = '6.2.3';
 
 const Error$1 = Error;
 
@@ -90,6 +90,7 @@ const {
 		Constructor,
 		ExclamationToken,
 		ExpressionWithTypeArguments,
+		TaggedTemplateExpression,
 	},
 } = require('typescript');
 
@@ -246,7 +247,8 @@ const from = (node      )         => {
 			break;
 		}
 		case CallExpression:
-		case NewExpression: {
+		case NewExpression:
+		case TaggedTemplateExpression: {
 			const children = [];
 			let index = 0;
 			for ( const { length } = childNodes; index!==length; ++index ) {
@@ -350,7 +352,11 @@ const from = (node      )         => {
 				}
 				ts_index = child.end;
 			}
-			if ( ts_index!==node.end ) { es[es.length] = ts.slice(ts_index, node.end); }
+			if ( ts_index!==node.end ) {
+				es[es.length] = gt
+					? removeFirstGT(ts.slice(ts_index, node.end))
+					: ts.slice(ts_index, node.end);
+			}
 			break;
 		}
 		case VariableDeclaration: {
