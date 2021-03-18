@@ -101,3 +101,5 @@ class X extends ( Array )       { }
 (     (t     ) => {} )     ``;
 
 class Name       {}
+
+let b       ;

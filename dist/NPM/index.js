@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.2.3';
+const version = '6.2.4';
 
 const Error$1 = Error;
 
@@ -182,6 +182,7 @@ const from = (node      )         => {
 		case PublicKeyword:
 		case IndexSignature:
 		case AbstractKeyword:
+		case ExclamationToken:
 			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
 			throwPos(ChildNodes(node)[0] .pos - 4, Error$1('enum'));
@@ -376,7 +377,7 @@ const from = (node      )         => {
 			while ( index!==childNodes_length ) {
 				const child = childNodes[index++] ;
 				if ( afterColon(child) ) { es[es.length] = ts.slice(ts_index, child.pos - 1) + remove(ts.slice(child.pos - 1, child.end)); }
-				else if ( child.kind===QuestionToken || child.kind===ExclamationToken ) { es[es.length] = ts.slice(ts_index, child.end - 1) + ' '; }
+				else if ( child.kind===QuestionToken ) { es[es.length] = ts.slice(ts_index, child.end - 1) + ' '; }
 				else {
 					if ( child.kind===AbstractKeyword ) { throwPos(child.end - 8, Error$1('abstract field expect declare')); }
 					if ( ts_index!==child.pos ) { es[es.length] = ts.slice(ts_index, child.pos); }
@@ -520,7 +521,7 @@ const transpileModule = (input        , jsx_transpileOptions                    
 
 const create = Object.create;
 
-const toStringTag = typeof Symbol!=='undefined' ? Symbol.toStringTag : undefined;
+const toStringTag = typeof Symbol==='undefined' ? undefined$1 : Symbol.toStringTag;
 
 const defineProperty = Object.defineProperty;
 
@@ -534,7 +535,7 @@ const NULL = (
 	/*¡ j-globals: null.prototype (internal) */
 );
 
-const assign = typeof Object!=='undefined' ? Object.assign : undefined;
+const assign = Object.assign;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

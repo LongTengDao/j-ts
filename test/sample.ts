@@ -101,3 +101,5 @@ class X extends ( Array ) < 1 > { }
 ( <T> (t :any) => {} ) <1> ``;
 
 class Name < T > {}
+
+let b ! : 1 ;
