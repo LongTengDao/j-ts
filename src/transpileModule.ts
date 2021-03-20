@@ -85,6 +85,7 @@ const {
 		ExclamationToken,
 		ExpressionWithTypeArguments,
 		TaggedTemplateExpression,
+		TemplateLiteralType,
 	},
 } = require('typescript');
 
@@ -124,6 +125,7 @@ const ChildNodes = (node :Node) :readonly Node[] => {
 
 const afterColon = (node :Node) => {
 	switch ( node.kind ) {
+		case TemplateLiteralType:
 		case ParenthesizedType:
 		case IndexedAccessType:
 		case IntersectionType:

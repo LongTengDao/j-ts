@@ -103,3 +103,5 @@ class X extends ( Array )       { }
 class Name       {}
 
 let b       ;
+
+( a          )          => a ;

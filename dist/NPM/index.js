@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.2.4';
+const version = '6.2.5';
 
 const Error$1 = Error;
 
@@ -91,6 +91,7 @@ const {
 		ExclamationToken,
 		ExpressionWithTypeArguments,
 		TaggedTemplateExpression,
+		TemplateLiteralType,
 	},
 } = require('typescript');
 
@@ -130,6 +131,7 @@ const ChildNodes = (node      )                  => {
 
 const afterColon = (node      ) => {
 	switch ( node.kind ) {
+		case TemplateLiteralType:
 		case ParenthesizedType:
 		case IndexedAccessType:
 		case IntersectionType:

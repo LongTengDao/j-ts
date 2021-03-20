@@ -76,6 +76,7 @@
 ✓	ExclamationToken	
 ✓	ExpressionWithTypeArguments	
 ✓	TaggedTemplateExpression	
+✓	TemplateLiteralType	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -377,7 +378,6 @@
 314	JSDocDeprecatedTag	
 —		
 136	IntrinsicKeyword	
-193	TemplateLiteralType	
 194	TemplateLiteralTypeSpan	
 302	JSDocNameReference	
 332	JSDocSeeTag	

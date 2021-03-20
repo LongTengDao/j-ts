@@ -103,3 +103,5 @@ class X extends ( Array ) < 1 > { }
 class Name < T > {}
 
 let b ! : 1 ;
+
+( a : `${1}` ) : `${1}` => a ;
