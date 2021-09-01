@@ -1,9 +1,25 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"strict": true,
-		"noImplicitReturns": true,
-		"noUnusedLocals": true,
+		"target": "ESNext"
+		,
+		"baseUrl": "../node_modules"
+		,
+		"paths": {
+			"typescript": [ "typescript/lib/typescript.d.ts" ]
+		}
+		,
+		"strict": true
+		,
+		"noImplicitReturns": true
+		,
+		"noUnusedLocals": true
+		,
 		"noUncheckedIndexedAccess": true
+		,
+		"noImplicitOverride": true
+		,
+		"isolatedModules": true
+		,
+		"exactOptionalPropertyTypes": true
 	}
 }

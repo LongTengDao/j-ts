@@ -86,8 +86,9 @@ const {
 		ExpressionWithTypeArguments,
 		TaggedTemplateExpression,
 		TemplateLiteralType,
+		OverrideKeyword,
 	},
-} = require('typescript');
+} :typeof import('typescript') = require('typescript');
 
 const throwPos = (pos :number, error :Error & { pos? :number }) :never => {
 	error.pos = pos;
@@ -117,7 +118,7 @@ let childNodes :Node[] = [];
 const childNodes_push = (child :Node) => { childNodes[childNodes.length] = child; };
 const ChildNodes = (node :Node) :readonly Node[] => {
 	try {
-		forEachChild(node, childNodes_push);
+		forEachChild(node as any, childNodes_push);
 		return childNodes;
 	}
 	finally { childNodes = []; }
@@ -179,6 +180,7 @@ const from = (node :Node) :string => {
 		case IndexSignature:
 		case AbstractKeyword:
 		case ExclamationToken:
+		case OverrideKeyword:
 			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
 			throwPos(ChildNodes(node)[0]!.pos - 4, Error('enum'));
@@ -481,11 +483,11 @@ const from = (node :Node) :string => {
 	return es.join('');
 };
 
-const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compilerOptions :{ jsx? :number | 'None' | 'Preserve' | 'ReactNative' } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } => {
+const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compilerOptions :{ jsx? :any } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } => {
 	ts = input;
 	try {
 		if ( typeof jsx_transpileOptions==='object' ) {
-			let scriptKind;
+			let scriptKind :typeof TS | typeof TSX;
 			switch ( jsx_transpileOptions.compilerOptions.jsx ) {
 				case undefined:
 				case None:

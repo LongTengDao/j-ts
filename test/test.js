@@ -2,7 +2,7 @@
 
 const EOL = /\r\n?|[\n\u2028\u2029]/;
 
-module.exports = require('@ltd/j-dev')(__dirname+'/..')(async function ({ import_default, get, put, ful }) {
+module.exports = require('j-dev')(__dirname+'/..')(async function ({ import_default, get, put, ful }) {
 	const transpileModule = await import_default('src/default', {
 		require: [ 'typescript' ],
 		ES: 6,

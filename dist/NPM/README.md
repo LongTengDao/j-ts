@@ -52,7 +52,7 @@ function* f(v) {
 | `enum $ { }`                                                |      ✓      |      ✗      | `import * as $ from '';`                        |
 | `import $ = require('');`                                   |      ✓      |      ✗      | `var $ :typeof import('') = require('');`       |
 | `export = $;`                                               |      ✓      |      ✗      | `module.exports = $;`                           |
-| jsx: React                                                  |      ✓      |      ✗      | Babel / ...                                     |
+| jsx => js                                                   |      ✓      |      ✗      | Babel...                                        |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------

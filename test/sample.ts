@@ -105,3 +105,6 @@ class Name < T > {}
 let b ! : 1 ;
 
 ( a : `${1}` ) : `${1}` => a ;
+
+class Super { m () {} }
+class Sub extends Super { override m () {} }

@@ -14,7 +14,7 @@ declare function transpileModule (input :string, jsx? :false | true) :string;
 
 declare function transpileModule (input :string, transpileOptions :object & {
 	readonly compilerOptions :object & {
-		readonly jsx? :number | 'None' | 'Preserve' | 'ReactNative',
+		readonly jsx? :number | 'Preserve' | 'ReactNative',
 		readonly sourceMap? :false,
 		readonly useDefineForClassFields :true,
 	},

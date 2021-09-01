@@ -1,12 +1,12 @@
 ﻿'use strict';
 
-const version = '6.2.5';
+const version = '6.3.0';
 
 const Error$1 = Error;
 
 const TypeError$1 = TypeError;
 
-const undefined$1 = void 0;
+const undefined$1 = void null;
 
 const {
 	transpileModule: TypeScript_transpileModule,
@@ -92,8 +92,9 @@ const {
 		ExpressionWithTypeArguments,
 		TaggedTemplateExpression,
 		TemplateLiteralType,
+		OverrideKeyword,
 	},
-} = require('typescript');
+}                              = require('typescript');
 
 const throwPos = (pos        , error                          )        => {
 	error.pos = pos;
@@ -123,7 +124,7 @@ let childNodes         = [];
 const childNodes_push = (child      ) => { childNodes[childNodes.length] = child; };
 const ChildNodes = (node      )                  => {
 	try {
-		forEachChild(node, childNodes_push);
+		forEachChild(node       , childNodes_push);
 		return childNodes;
 	}
 	finally { childNodes = []; }
@@ -185,6 +186,7 @@ const from = (node      )         => {
 		case IndexSignature:
 		case AbstractKeyword:
 		case ExclamationToken:
+		case OverrideKeyword:
 			return remove(ts.slice(ts_index, node.end));
 		case EnumDeclaration:
 			throwPos(ChildNodes(node)[0] .pos - 4, Error$1('enum'));
@@ -486,11 +488,11 @@ const from = (node      )         => {
 	return es.join('');
 };
 
-const transpileModule = (input        , jsx_transpileOptions                                                                                        )                                                                                            => {
+const transpileModule = (input        , jsx_transpileOptions                                               )                                                                                            => {
 	ts = input;
 	try {
 		if ( typeof jsx_transpileOptions==='object' ) {
-			let scriptKind;
+			let scriptKind                        ;
 			switch ( jsx_transpileOptions.compilerOptions.jsx ) {
 				case undefined$1:
 				case None:
@@ -541,26 +543,26 @@ const assign = Object.assign;
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-var hasOwn = hasOwnProperty.bind
-	? /*#__PURE__*/hasOwnProperty.call.bind(hasOwnProperty)
-	: function (object, key) { return /*#__PURE__*/hasOwnProperty.call(object, key); };// && object!=null
+var hasOwn = /*#__PURE__*/function () {
+	return hasOwnProperty.bind
+		? hasOwnProperty.call.bind(hasOwnProperty)
+		: function (object, key) { return hasOwnProperty.call(object, key); };
+}();// && object!=null
 
 const Default = (
 	/*! j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
-		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
-			if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(NULL); }
-			if ( assign ) { assign(exports, addOnOrigin); }
-			else { for ( var key in addOnOrigin ) { if ( hasOwn(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
-			exports.default = exports;
-			if ( toStringTag ) {
-				var descriptor = create(NULL);
-				descriptor.value = 'Module';
-				defineProperty(exports, toStringTag, descriptor);
-			}
-			typeof exports==='function' && exports.prototype && freeze(exports.prototype);
-			return freeze(exports);
-		}(exports, addOnOrigin);
+		if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(NULL); }
+		if ( assign ) { assign(exports, addOnOrigin); }
+		else { for ( var key in addOnOrigin ) { if ( hasOwn(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
+		exports.default = exports;
+		if ( toStringTag ) {
+			var descriptor = create(NULL);
+			descriptor.value = 'Module';
+			defineProperty(exports, toStringTag, descriptor);
+		}
+		typeof exports==='function' && exports.prototype && freeze(exports.prototype);
+		return freeze(exports);
 	}
 	/*¡ j-globals: default (internal) */
 );

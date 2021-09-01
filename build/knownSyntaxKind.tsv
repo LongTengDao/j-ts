@@ -77,6 +77,7 @@
 ✓	ExpressionWithTypeArguments	
 ✓	TaggedTemplateExpression	
 ✓	TemplateLiteralType	
+✓	OverrideKeyword	
 —		
 000	Unknown	
 002	SingleLineCommentTrivia	
@@ -381,3 +382,13 @@
 194	TemplateLiteralTypeSpan	
 302	JSDocNameReference	
 332	JSDocSeeTag	
+—		
+313	JSDocText	
+316	JSDocLink	
+327	JSDocOverrideTag	
+—		
+ 62	HashToken	
+168	ClassStaticBlockDeclaration	
+306	JSDocMemberName	
+320	JSDocLinkCode	
+321	JSDocLinkPlain	

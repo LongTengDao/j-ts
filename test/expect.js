@@ -105,3 +105,6 @@ class Name       {}
 let b       ;
 
 ( a          )          => a ;
+
+class Super { m () {} }
+class Sub extends Super {          m () {} }
