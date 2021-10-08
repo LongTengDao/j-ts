@@ -483,12 +483,12 @@ const from = (node :Node) :string => {
 	return es.join('');
 };
 
-const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compilerOptions :{ jsx? :any } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } => {
+const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compilerOptions? :{ jsx? :any } }) :string | { outputText :string, diagnostics :undefined | any[], sourceMapText :undefined } => {
 	ts = input;
 	try {
 		if ( typeof jsx_transpileOptions==='object' ) {
 			let scriptKind :typeof TS | typeof TSX;
-			switch ( jsx_transpileOptions.compilerOptions.jsx ) {
+			switch ( jsx_transpileOptions.compilerOptions?.jsx ) {
 				case undefined:
 				case None:
 				case 'None':
@@ -498,10 +498,13 @@ const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compi
 				case ReactNative:
 				case 'Preserve':
 				case 'ReactNative':
+				case 'preserve':
+				case 'react-native':
 					scriptKind = TSX;
 					break;
 				case React:
 				case 'React':
+				case 'react':
 					throw TypeError('transpileModule(,{compilerOptions:{jsx:React}})');
 				default:
 					throw TypeError('transpileModule(,{compilerOptions:{jsx:unknown}})');
@@ -513,7 +516,7 @@ const transpileModule = (input :string, jsx_transpileOptions? :boolean | { compi
 				sourceMapText: undefined,
 			};
 		}
-		else { return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)); }
+		else { return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions ? TSX : TS)); }
 	}
 	finally { ts = ''; }
 };

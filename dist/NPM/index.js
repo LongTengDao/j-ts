@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '6.3.0';
+const version = '6.3.1';
 
 const Error$1 = Error;
 
@@ -488,12 +488,12 @@ const from = (node      )         => {
 	return es.join('');
 };
 
-const transpileModule = (input        , jsx_transpileOptions                                               )                                                                                            => {
+const transpileModule = (input        , jsx_transpileOptions                                                )                                                                                            => {
 	ts = input;
 	try {
 		if ( typeof jsx_transpileOptions==='object' ) {
 			let scriptKind                        ;
-			switch ( jsx_transpileOptions.compilerOptions.jsx ) {
+			switch ( jsx_transpileOptions.compilerOptions?.jsx ) {
 				case undefined$1:
 				case None:
 				case 'None':
@@ -503,10 +503,13 @@ const transpileModule = (input        , jsx_transpileOptions                    
 				case ReactNative:
 				case 'Preserve':
 				case 'ReactNative':
+				case 'preserve':
+				case 'react-native':
 					scriptKind = TSX;
 					break;
 				case React:
 				case 'React':
+				case 'react':
 					throw TypeError$1('transpileModule(,{compilerOptions:{jsx:React}})');
 				default:
 					throw TypeError$1('transpileModule(,{compilerOptions:{jsx:unknown}})');
@@ -518,7 +521,7 @@ const transpileModule = (input        , jsx_transpileOptions                    
 				sourceMapText: undefined$1,
 			};
 		}
-		else { return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions===true ? TSX : TS)); }
+		else { return from(createSourceFile('', ts, ESNext, false, jsx_transpileOptions ? TSX : TS)); }
 	}
 	finally { ts = ''; }
 };
