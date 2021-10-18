@@ -2,7 +2,7 @@
 `@ltd/j-ts`
 ===========
 
-```
+```shell
 npm install @ltd/j-ts
 ```
 
@@ -11,7 +11,7 @@ npm install @ltd/j-ts
 
 ### `input.ts`
 
-```
+```TypeScript
 	type T = any;
 	
 	function * f (v :T) :T {
@@ -20,9 +20,9 @@ npm install @ltd/j-ts
 	
 ```
 
-### `require('@ltd/j-ts')(input :string, jsx :boolean = false)`
+### `require('@ltd/j-ts')(input :string, jsx :( (value :string) => string ) | boolean = false, fileName? :string)`
 
-```
+```JavaScript
 	             
 	
 	function * f (v   )    {
@@ -31,12 +31,12 @@ npm install @ltd/j-ts
 	
 ```
 
-(The error thrown will have a `pos :number` property if possible.)  
-（抛出错误时，会尽量带上 `pos :number` 属性。）  
+(The error thrown for `input` will have a `pos :number` property.)  
+（对 `input` 抛出的错误，会带上 `pos :number` 属性。）  
 
-### `require('typescript').transpileModule(input :string, options :{}).outputText`
+### `require('typescript').transpileModule(input :string, options).outputText`
 
-```
+```JavaScript
 function* f(v) {
     return v;
 }
@@ -45,14 +45,13 @@ function* f(v) {
 `typescript` ko `@ltd/j-ts`
 ---------------------------
 
-|                                                             | `typescript` | `@ltd/j-ts`  |                 <kbd>Alt</kbd>                  |
-|-------------------------------------------------------------|:------------:|:------------:|-------------------------------------------------|
-| `public` / `protected` / `private` / `readonly` parameter   |      ✓      |      ✗      | field                                           |
-| `return` / `throw` / `yield` + type + eol + value           |      ✓      |      ✗      | - eol                                           |
-| `enum $ { }`                                                |      ✓      |      ✗      | `import * as $ from '';`                        |
-| `import $ = require('');`                                   |      ✓      |      ✗      | `var $ :typeof import('') = require('');`       |
-| `export = $;`                                               |      ✓      |      ✗      | `module.exports = $;`                           |
-| jsx => js                                                   |      ✓      |      ✗      | Babel...                                        |
+|                                                                       | `typescript` | `@ltd/j-ts`  |              <kbd>Alt</kbd>               |
+|-----------------------------------------------------------------------|:------------:|:------------:|-------------------------------------------|
+| `public` / `protected` / `private` / `readonly` constructor parameter |      ✓      |      ✗      | ECMAScript class field                    |
+| `enum $ { }`                                                          |      ✓      |      ✗      | `import * as $ from '';`                  |
+| `import $ = require('');`                                             |      ✓      |      ✗      | `var $ :typeof import('') = require('');` |
+| `export = $;`                                                         |      ✓      |      ✗      | `module.exports = $;`                     |
+| `@$`                                                                  |      ✓      |      ✗      | wait ECMAScript decorator proposal        |
 
 `@ltd/j-ts` ko `typescript`
 ---------------------------

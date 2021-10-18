@@ -108,3 +108,30 @@ let b ! : 1 ;
 
 class Super { m () {} }
 class Sub extends Super { override m () {} }
+
+( ) : 1 => {
+	return<
+		1
+	>1;
+};
+
+( ) : 1 => {
+	return < 1 >
+		1;
+};
+
+( ) : never => {
+	throw < 1 >
+		1;
+};
+
+function * YIELD ( ) {
+	yield < 1 >
+		1;
+}
+
+(
+)
+	:
+	[
+	] => [];

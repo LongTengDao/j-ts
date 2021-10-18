@@ -108,3 +108,30 @@ let b       ;
 
 class Super { m () {} }
 class Sub extends Super {          m () {} }
+
+( )     => {
+	return+
+		0
+	,1;
+};
+
+( )     => {
+	return 0   ,
+		1;
+};
+
+( )         => {
+	throw 0   ,
+		1;
+};
+
+function * YIELD ( ) {
+	yield{$:0}.
+$=1;
+}
+
+(
+)=>
+	 
+	 
+	     [];

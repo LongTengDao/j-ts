@@ -24,6 +24,7 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 			description:
 				'Pure transpiler for TypeScript. Belong to "Plan J".／'+
 				'TypeScript 纯转译工具。从属于“简计划”。',
+			keywords: [ 'TypeScript', 'TS', 'TSX' ],
 			dependencies: {
 				'typescript': '4.4.3',
 			},
@@ -31,6 +32,9 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 		ES: 6,
 		semver: await get('src/version'),
 		LICENSE_: true,
+		locate: {
+			'@ltd/j-es': '../j-es/dist/ESM/.j-es.js',
+		},
 	});
-	await map('docs/README.md', gh => gh.replace(/(?<=[\n\r][ \t]*```+)[ \t]*\.?\w+[ \t]*(?=[\n\r])/g, ''), 'dist/NPM/README.md');
+	await map('docs/README.md'/*, gh => gh.replace(/(?<=[\n\r][ \t]*```+)[ \t]*\.?\w+[ \t]*(?=[\n\r])/g, '')*/, 'dist/NPM/README.md');
 });

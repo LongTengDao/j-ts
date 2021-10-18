@@ -2,10 +2,11 @@
 	"compilerOptions": {
 		"target": "ESNext"
 		,
-		"baseUrl": "../node_modules"
+		"baseUrl": ".."
 		,
 		"paths": {
-			"typescript": [ "typescript/lib/typescript.d.ts" ]
+			"typescript": [ "./node_modules/typescript/lib/typescript.d.ts" ],
+			"@ltd/j-es": [ "../j-es/src/export.d.ts" ]
 		}
 		,
 		"strict": true

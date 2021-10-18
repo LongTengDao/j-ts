@@ -6,23 +6,17 @@ indent_size = 4
 [.*]
 indent_size = 4
 
-[/build/*.tsv]
+[/build/knownSyntaxKind.tsv]
 indent_size = 45
 trim_trailing_whitespace = false
 insert_final_newline = false
 
-[/docs/*]
+[/docs/README.md]
 charset = utf-8-bom
 end_of_line = crlf
 trim_trailing_whitespace = false
 
-[/test/sample.ts]
-charset = utf-8
-end_of_line = crlf
-trim_trailing_whitespace = false
-insert_final_newline = false
-
-[/test/expect.js]
+[/test/{1,2,3}.{sample,expect}.{ts,tsx,jsx,js}]
 charset = utf-8
 end_of_line = crlf
 trim_trailing_whitespace = false

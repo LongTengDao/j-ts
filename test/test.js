@@ -1,25 +1,28 @@
 'use strict';
 
 const EOL = /\r\n?|[\n\u2028\u2029]/;
+const jsx = $ => `createElement(${/^[a-z][^.]*$|[-:]/.test($) ? `'${$}'` : $ || 'Fragment'},`;
 
-module.exports = require('j-dev')(__dirname+'/..')(async function ({ import_default, get, put, ful }) {
+module.exports = require('j-dev')(__dirname + '/..')(async function ({ import_default, get, put }) {
 	const transpileModule = await import_default('src/default', {
-		require: [ 'typescript' ],
 		ES: 6,
+		require: [ 'typescript', '@ltd/j-es' ],
 	});
-	const sample = await get('test/sample.ts');
-	let output;
-	try { output = transpileModule(sample); }
-	catch (posError) {
-		if ( typeof posError.pos==='number' ) {
-			const before = sample.slice(0, posError.pos).split(/\r\n?|[\n\u2028\u2029]/);
-			posError.message += `\n    at (${ful('test/sample.ts')}:${before.length}:${before[before.length - 1].length + 1})`;
-		}
-		throw posError;
-	}
-	const expect = await get('test/expect.js');
-	if ( output!==expect ) {
-		await put('test/output#.js', output);
+	await [
+		[ 'ts' , 'js' , undefined ],
+		[ 'tsx', 'jsx', true ],
+		[ 'tsx', 'js' , jsx ],
+	]
+	.reduce(async function cb (ret, one, n) {
+		if ( !one ) { return; }
+		await ret;
+		++n;
+		const [ sampleExt, expectExt, jsx ] = one;
+		const sample = await get(`test/${n}.sample.${sampleExt}`);
+		const output = transpileModule(sample, jsx);
+		const expect = await get(`test/${n}.expect.${expectExt}`);
+		if ( output===expect ) { return; }
+		await put(`test/output#.jsx`, output);
 		const outputLines = output.split(EOL);
 		const expectLines = expect.split(EOL);
 		const length = Math.min(output.length, expect.length);
@@ -31,24 +34,21 @@ module.exports = require('j-dev')(__dirname+'/..')(async function ({ import_defa
 				for ( const length = Math.min(outputLine.length, expectLine.length); columnIndex<length; ++columnIndex ) {
 					if ( outputLine[columnIndex]!==expectLine[columnIndex] ) { break; }
 				}
-				throwError('inline', lineIndex+1, columnIndex+1);
+				throwError('inline', lineIndex + 1, columnIndex + 1);
 			}
 		}
-		if ( output.length!==expect.length ) {
-			throwError('eof', length, outputLines[length-1].length+1);
+		output.length===expect.length || throwError('eof', length, outputLines[length - 1].length + 1);
+		throw Error(`${n} eol`);
+		function throwError (message, lineNumber, columnNumber) {
+			const { sep } = require('path');
+			const error = Error(`${n} ${message}`);
+			error.stack = [
+				`Error: ${n} ${message}`,
+				`    at ${__dirname}${sep}output#.jsx:${lineNumber}:${columnNumber}`,
+				`    at ${__dirname}${sep}${n}.expect.${expectExt}:${lineNumber}:${columnNumber}`,
+				`    at ${__dirname}${sep}${n}.sample.${sampleExt}:${lineNumber}:${columnNumber}`,
+			].join('\n');
+			throw error;
 		}
-		throw Error('eol');
-	}
+	}, Promise.resolve());
 });
-
-function throwError (message, lineNumber, columnNumber) {
-	const { sep } = require('path');
-	const error = Error(message);
-	error.stack = [
-		`Error: ${message}`,
-		`    at ${__dirname}${sep}sample.ts:${lineNumber}:${columnNumber}`,
-		`    at ${__dirname}${sep}output#.js:${lineNumber}:${columnNumber}`,
-		`    at ${__dirname}${sep}expect.js:${lineNumber}:${columnNumber}`,
-	].join('\n');
-	throw error;
-}
