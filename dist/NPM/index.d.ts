@@ -2,7 +2,7 @@ export = exports;
 
 declare const exports :typeof transpileModule & object & Readonly<{
 	
-	version :'7.0.0',
+	version :'7.1.0',
 	
 	transpileModule :typeof transpileModule,
 	
@@ -15,7 +15,7 @@ declare function transpileModule (input :string, jsx? :false | true | ( (this :v
 declare function transpileModule (input :string, transpileOptions :object & {
 	readonly compilerOptions? :object & {
 		readonly sourceMap? :false,
-		readonly jsx? :0 | 1 | 3 | 'preserve' | 'react-native',// 'react-jsx' 'react-jsxdev'
+		readonly jsx? :0 | 1 | 2 | 3 | 'preserve' | 'react' | 'react-native',// 'react-jsx' 'react-jsxdev'
 		readonly jsxImportSource? :undefined,// 'react' | string += '/jsx-runtime' '/jsx-dev-runtime'
 		readonly jsxFactory? :'/*#__PURE__*/React.createElement' | string,
 		readonly jsxFragmentFactory? :'React.Fragment' | string,

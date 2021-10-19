@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '7.0.0';
+const version$1 = '7.1.0';
 
 const TypeError$1 = TypeError;
 
