@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '9.0.1';
+const version$1 = '9.0.2';
 
 const TypeError$1 = TypeError;
 
@@ -979,7 +979,7 @@ const resetIfNewline = (code        ) => {
 	if ( credit && INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/);
 const Along = (along        )         => {
 	const parts = along.split('.');
 	if ( !isIdentifier(parts[0] ) ) { return ''; }
@@ -995,13 +995,13 @@ const readJSX = () => {
 		if ( _$ ) {
 			if ( at[4]==='F' ) {
 				if ( jsxFragmentFactory===undefined$1 ) {
-					jsxFragmentFactory = Along(_$[1] );
+					jsxFragmentFactory = _$[2] ? Along(_$[1] ) : '';
 					if ( jsxFactory!==undefined$1 ) { break; }
 				}
 			}
 			else {
 				if ( jsxFactory===undefined$1 ) {
-					jsxFactory = Along(_$[1] );
+					jsxFactory = _$[2] ? Along(_$[1] ) : '';
 					if ( jsxFragmentFactory!==undefined$1 ) { break; }
 				}
 			}

@@ -47,7 +47,7 @@ const resetIfNewline = (code :string) => {
 	if ( credit && util.INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/);
 const Along = (along :string) :string => {
 	const parts = along.split('.');
 	if ( !isIdentifier(parts[0]!) ) { return ''; }
@@ -63,13 +63,13 @@ const readJSX = () => {
 		if ( _$ ) {
 			if ( at[4]==='F' ) {
 				if ( jsxFragmentFactory===undefined ) {
-					jsxFragmentFactory = Along(_$[1]!);
+					jsxFragmentFactory = _$[2] ? Along(_$[1]!) : '';
 					if ( jsxFactory!==undefined ) { break; }
 				}
 			}
 			else {
 				if ( jsxFactory===undefined ) {
-					jsxFactory = Along(_$[1]!);
+					jsxFactory = _$[2] ? Along(_$[1]!) : '';
 					if ( jsxFragmentFactory!==undefined ) { break; }
 				}
 			}
