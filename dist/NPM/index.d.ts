@@ -2,7 +2,7 @@ export = exports;
 
 declare const exports :typeof transpileModule & object & Readonly<{
 	
-	version :'7.1.0',
+	version :'8.0.0',
 	
 	transpileModule :typeof transpileModule,
 	
@@ -10,7 +10,19 @@ declare const exports :typeof transpileModule & object & Readonly<{
 	
 }>;
 
-declare function transpileModule (input :string, jsx? :false | true | ( (this :void, value :string, index :number) => `${string}(${string},` | `${string}(` ), fileName? :string) :string;
+declare function transpileModule (input :string, jsx :false | true | ( (this :void, name :string, {} :{
+	index :number
+	path :string
+	code :string
+	type :boolean
+}) => `${string}(${string},` | `${string}(` ), fileName :string) :string;
+
+declare function transpileModule (input :string, jsx? :false | true | ( (this :void, name :string, {} :{
+	index :number
+	path :undefined
+	code :string
+	type :boolean
+}) => `${string}(${string},` | `${string}(` ), fileName? :undefined) :string;
 
 declare function transpileModule (input :string, transpileOptions :object & {
 	readonly compilerOptions? :object & {

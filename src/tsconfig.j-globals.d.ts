@@ -63,6 +63,7 @@ declare module '.Reflect.apply?=' { export default apply;
 }
 
 declare module '.RegExp' { export default RegExp; }
+declare module '.RegExp.prototype.exec' { export default RegExp.prototype.exec; }
 declare module '.RegExp.prototype.test' { export default RegExp.prototype.test; }
 
 declare module '.Set.prototype.has?' { export default Set.prototype.has; }

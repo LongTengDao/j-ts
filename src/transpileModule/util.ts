@@ -19,6 +19,25 @@ export const FIRST_MAYBE_SECOND_WHITESPACE = /^[^\n\r/\u2028\u2029]{1,2}/;
 export const TAB_INDENT = /^(?:[\n\r\u2028\u2029]\t*)+/;
 export const SPACE_INDENT = /^(?:[\n\r\u2028\u2029] *)+/;
 
+const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
+	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
+	re.test = test;
+	return re;
+} )();
+const AT$_$ = /@\S+\s+.*/g;
+export function * readAT (this :void) :Generator<string, void, void> {
+	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
+	while ( LEADING_WHITESPACE_OR_COMMENT.test(ing.ts) ) {
+		if ( ing.ts.startsWith('/*', lastIndex) ) {
+			const all = ing.ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2).match(AT$_$);
+			if ( all ) {
+				for ( const each of all ) { yield each; }
+			}
+		}
+		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
+	}
+}
+
 export const min = (a :number, b :number) => a<b ? a : b;
 
 export const slice = (start :number, end? :number) => ing.ts.slice(start, end);

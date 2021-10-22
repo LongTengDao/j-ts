@@ -1,9 +1,10 @@
 import Error from '.Error';
 import TypeError from '.TypeError';
 import test from '.RegExp.prototype.test';
+import exec from '.RegExp.prototype.exec';
 import undefined from '.undefined';
 
-import { StringLiteral } from '@ltd/j-es';
+import { StringLiteral, isIdentifierName, isIdentifier } from '@ltd/j-es';
 
 import * as deps from '../../deps';
 import * as ing from '../ing';
@@ -46,23 +47,61 @@ const resetIfNewline = (code :string) => {
 	if ( credit && util.INCLUDES_EOL(code) ) { credit = 0; }
 };
 
+let $jsx :string | undefined;
+let $jsxFrag :string | undefined;
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
+const Along = (along :string) :string => {
+	const parts = along.split('.');
+	if ( !isIdentifier(parts[0]!) ) { return ''; }
+	let index = parts.length;
+	while ( --index ) {
+		if ( !isIdentifierName(parts[index]!) ) { return ''; }
+	}
+	return along;
+};
+const readJSX = () => {
+	for ( const at of util.readAT() ) {
+		const _$ = jsx$_$(at.slice(1));
+		if ( _$ ) {
+			if ( at[4]==='F' ) {
+				if ( $jsxFrag===undefined ) {
+					$jsxFrag = Along(_$[1]!);
+					if ( $jsx!==undefined ) { break; }
+				}
+			}
+			else {
+				if ( $jsx===undefined ) {
+					$jsx = Along(_$[1]!);
+					if ( $jsxFrag!==undefined ) { break; }
+				}
+			}
+		}
+	}
+};
+
 const noReasonNotString = /*#__PURE__*/test.bind(/^[a-z][^.]*$/);
-const GENERATE_START :GenerateStart = (value, index) =>
+const GENERATE_START :GenerateStart = (value, { index, type }) =>
 	value
 		? value==='this'
 			? util.throwPosError(index - 1, `tag name should better not be "this", because it should be an intrinsic element according to the current react jsx spec/docs, but is a value-based element in typescript and babel in fact for historical reason, so please use it more exactly via a variable`)
 			: noReasonNotString(value) || couldNotNotString(value)
-				? ing.ts[index + value.length]==='<' ? util.throwPosError(index - 1, `intrinsic element cannot has type arguments`) : `${jsxFactory}('${value}',`
+				? type ? util.throwPosError(index - 1, `intrinsic element cannot has type arguments`) : `${jsxFactory}('${value}',`
 				: `${jsxFactory}(${value},`
 		: `${jsxFactory}(${jsxFragmentFactory!},null,`;
 let generateStart :GenerateStart = GENERATE_START;
 
 export const off = () :void => {
-	jsxFactory = jsxFragmentFactory = undefined;
+	$jsx = $jsxFrag = jsxFactory = jsxFragmentFactory = undefined;
 	generateStart = GENERATE_START;
 };
-export type GenerateStart = (this :void, value :string, index :number) => `${string}(${string},` | `${string}(`;
+export type GenerateStart = (this :void, name :string, {} :{
+	index :number
+	path :string | undefined
+	code :string
+	type :boolean
+}) => `${string}(${string},` | `${string}(`;
 export const on = (jsx :GenerateStart) :void => {
+	readJSX();
 	generateStart = jsx;
 };
 export type CompilerOptions = {
@@ -71,25 +110,32 @@ export type CompilerOptions = {
 	readonly reactNamespace? :string,
 } | undefined;
 export const on$ = (compilerOptions :CompilerOptions) :void => {
-	jsxFactory = compilerOptions?.jsxFactory;
-	jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
+	readJSX();
 	let reactNamespace :string | undefined;
-	if ( jsxFactory===undefined ) {
-		reactNamespace = compilerOptions?.reactNamespace;
-		if ( reactNamespace===undefined ) { reactNamespace = 'React'; }
-		else if ( typeof reactNamespace!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
-		jsxFragmentFactory = reactNamespace + '.createElement';
-	}
-	else if ( typeof jsxFactory!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
-	if ( jsxFragmentFactory===undefined ) {
-		if ( reactNamespace===undefined ) {
+	if ( $jsx ) { jsxFactory = $jsx; }
+	else {
+		jsxFactory = compilerOptions?.jsxFactory;
+		if ( jsxFactory===undefined ) {
 			reactNamespace = compilerOptions?.reactNamespace;
 			if ( reactNamespace===undefined ) { reactNamespace = 'React'; }
 			else if ( typeof reactNamespace!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
+			jsxFactory = reactNamespace + '.createElement';
 		}
-		jsxFragmentFactory = reactNamespace + '.Fragment';
+		else if ( typeof jsxFactory!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
 	}
-	else if ( typeof jsxFragmentFactory!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',jsxFragmentFactory:!string}})`); }
+	if ( $jsxFrag ) { jsxFragmentFactory = $jsxFrag; }
+	else {
+		jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
+		if ( jsxFragmentFactory===undefined ) {
+			if ( reactNamespace===undefined ) {
+				reactNamespace = compilerOptions?.reactNamespace;
+				if ( reactNamespace===undefined ) { reactNamespace = 'React'; }
+				else if ( typeof reactNamespace!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
+			}
+			jsxFragmentFactory = reactNamespace + '.Fragment';
+		}
+		else if ( typeof jsxFragmentFactory!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',jsxFragmentFactory:!string}})`); }
+	}
 	generateStart = GENERATE_START;
 };
 
@@ -112,7 +158,13 @@ function * FragmentGenerator (this :void, node :deps.JsxFragment, reset :boolean
 	const _real = util.codeOf(node.openingFragment);
 	const real = util.trimBefore(_real);
 	yield coverCode(``, _real.slice(0, -real.length));
-	const start = generateStart('', node.openingFragment.end - real.length);
+	const index = node.openingFragment.end - real.length;
+	const start = generateStart('', {
+		index,
+		path: ing.filename,
+		code: ing.ts,
+		type: false,
+	});
 	if ( typeof start!=='string' ) { throw TypeError(`transpileModule(,jsx) must return a string`); }
 	let needComma = true;
 	switch ( start[start.length - 1] ) {
@@ -175,7 +227,12 @@ function * Opening (this :void, node :deps.JsxSelfClosingElement | deps.JsxOpeni
 	const indexOfBackslash = tag_min.indexOf('\\');
 	indexOfBackslash<0 || util.throwPosError(tagName.pos + indexOfBackslash, `tag name should better not contain UnicodeEscapeSequence`);
 	node.typeArguments && tagName.end + 1!==node.typeArguments.pos && util.throwPosError(tagName.pos - 1, `whitespaces and comments should better not appear between tag name and type argument`);
-	const start = generateStart(tag_min, tagName.pos);
+	const start = generateStart(tag_min, {
+		index: tagName.pos,
+		path: ing.filename,
+		code: ing.ts,
+		type: ing.ts[tagName.end]==='<',
+	});
 	if ( typeof start!=='string' ) { throw TypeError(`transpileModule(,jsx) must return a string`); }
 	switch ( start[start.length - 1] ) {
 		case ',': break;

@@ -20,7 +20,7 @@ npm install @ltd/j-ts
 	
 ```
 
-### `require('@ltd/j-ts')(input :string, jsx :( (value :string) => string ) | boolean = false, fileName? :string)`
+### `require('@ltd/j-ts')(input :string, jsx :( (name :string) => string ) | boolean = false, fileName? :string)`
 
 ```JavaScript
 	             

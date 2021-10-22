@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '7.1.0';
+const version$1 = '8.0.0';
 
 const TypeError$1 = TypeError;
 
@@ -139,6 +139,25 @@ const CHAR_NOT_EOL = /*#__PURE__*/test.bind(/[^\n\r/\u2028\u2029]/);
 const FIRST_MAYBE_SECOND_WHITESPACE = /^[^\n\r/\u2028\u2029]{1,2}/;
 const TAB_INDENT = /^(?:[\n\r\u2028\u2029]\t*)+/;
 const SPACE_INDENT = /^(?:[\n\r\u2028\u2029] *)+/;
+
+const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
+	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
+	re.test = test;
+	return re;
+} )();
+const AT$_$ = /@\S+\s+.*/g;
+function * readAT (          )                                {
+	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
+	while ( LEADING_WHITESPACE_OR_COMMENT.test(ts) ) {
+		if ( ts.startsWith('/*', lastIndex) ) {
+			const all = ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2).match(AT$_$);
+			if ( all ) {
+				for ( const each of all ) { yield each; }
+			}
+		}
+		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
+	}
+}
 
 const min = (a        , b        ) => a<b ? a : b;
 
@@ -407,6 +426,8 @@ function * Attributes$1 (            { properties }                    )        
 		isLast = ++index===lastIndex;
 	}
 }
+
+const exec = RegExp.prototype.exec;
 
 const bind = Function.prototype.bind;
 
@@ -959,23 +980,61 @@ const resetIfNewline = (code        ) => {
 	if ( credit && INCLUDES_EOL(code) ) { credit = 0; }
 };
 
+let $jsx                    ;
+let $jsxFrag                    ;
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
+const Along = (along        )         => {
+	const parts = along.split('.');
+	if ( !isIdentifier(parts[0] ) ) { return ''; }
+	let index = parts.length;
+	while ( --index ) {
+		if ( !isIdentifierName(parts[index] ) ) { return ''; }
+	}
+	return along;
+};
+const readJSX = () => {
+	for ( const at of readAT() ) {
+		const _$ = jsx$_$(at.slice(1));
+		if ( _$ ) {
+			if ( at[4]==='F' ) {
+				if ( $jsxFrag===undefined$1 ) {
+					$jsxFrag = Along(_$[1] );
+					if ( $jsx!==undefined$1 ) { break; }
+				}
+			}
+			else {
+				if ( $jsx===undefined$1 ) {
+					$jsx = Along(_$[1] );
+					if ( $jsxFrag!==undefined$1 ) { break; }
+				}
+			}
+		}
+	}
+};
+
 const noReasonNotString = /*#__PURE__*/test.bind(/^[a-z][^.]*$/);
-const GENERATE_START                = (value, index) =>
+const GENERATE_START                = (value, { index, type }) =>
 	value
 		? value==='this'
 			? throwPosError(index - 1, `tag name should better not be "this", because it should be an intrinsic element according to the current react jsx spec/docs, but is a value-based element in typescript and babel in fact for historical reason, so please use it more exactly via a variable`)
 			: noReasonNotString(value) || couldNotNotString(value)
-				? ts[index + value.length]==='<' ? throwPosError(index - 1, `intrinsic element cannot has type arguments`) : `${jsxFactory}('${value}',`
+				? type ? throwPosError(index - 1, `intrinsic element cannot has type arguments`) : `${jsxFactory}('${value}',`
 				: `${jsxFactory}(${value},`
 		: `${jsxFactory}(${jsxFragmentFactory },null,`;
 let generateStart                = GENERATE_START;
 
 const off$1 = ()       => {
-	jsxFactory = jsxFragmentFactory = undefined$1;
+	$jsx = $jsxFrag = jsxFactory = jsxFragmentFactory = undefined$1;
 	generateStart = GENERATE_START;
 };
-                                                                                                                
+                                                            
+	             
+	                        
+	            
+	             
+                                            
 const on = (jsx               )       => {
+	readJSX();
 	generateStart = jsx;
 };
                                
@@ -984,25 +1043,32 @@ const on = (jsx               )       => {
 	                                 
               
 const on$ = (compilerOptions                 )       => {
-	jsxFactory = compilerOptions?.jsxFactory;
-	jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
+	readJSX();
 	let reactNamespace                    ;
-	if ( jsxFactory===undefined$1 ) {
-		reactNamespace = compilerOptions?.reactNamespace;
-		if ( reactNamespace===undefined$1 ) { reactNamespace = 'React'; }
-		else if ( typeof reactNamespace!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
-		jsxFragmentFactory = reactNamespace + '.createElement';
-	}
-	else if ( typeof jsxFactory!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
-	if ( jsxFragmentFactory===undefined$1 ) {
-		if ( reactNamespace===undefined$1 ) {
+	if ( $jsx ) { jsxFactory = $jsx; }
+	else {
+		jsxFactory = compilerOptions?.jsxFactory;
+		if ( jsxFactory===undefined$1 ) {
 			reactNamespace = compilerOptions?.reactNamespace;
 			if ( reactNamespace===undefined$1 ) { reactNamespace = 'React'; }
 			else if ( typeof reactNamespace!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
+			jsxFactory = reactNamespace + '.createElement';
 		}
-		jsxFragmentFactory = reactNamespace + '.Fragment';
+		else if ( typeof jsxFactory!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
 	}
-	else if ( typeof jsxFragmentFactory!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',jsxFragmentFactory:!string}})`); }
+	if ( $jsxFrag ) { jsxFragmentFactory = $jsxFrag; }
+	else {
+		jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
+		if ( jsxFragmentFactory===undefined$1 ) {
+			if ( reactNamespace===undefined$1 ) {
+				reactNamespace = compilerOptions?.reactNamespace;
+				if ( reactNamespace===undefined$1 ) { reactNamespace = 'React'; }
+				else if ( typeof reactNamespace!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',reactNamespace:!string}})`); }
+			}
+			jsxFragmentFactory = reactNamespace + '.Fragment';
+		}
+		else if ( typeof jsxFragmentFactory!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',jsxFragmentFactory:!string}})`); }
+	}
 	generateStart = GENERATE_START;
 };
 
@@ -1025,7 +1091,13 @@ function * FragmentGenerator (            node                  , reset         
 	const _real = codeOf(node.openingFragment);
 	const real = trimBefore(_real);
 	yield coverCode(``, _real.slice(0, -real.length));
-	const start = generateStart('', node.openingFragment.end - real.length);
+	const index = node.openingFragment.end - real.length;
+	const start = generateStart('', {
+		index,
+		path: filename,
+		code: ts,
+		type: false,
+	});
 	if ( typeof start!=='string' ) { throw TypeError$1(`transpileModule(,jsx) must return a string`); }
 	let needComma = true;
 	switch ( start[start.length - 1] ) {
@@ -1088,7 +1160,12 @@ function * Opening (            node                                            
 	const indexOfBackslash = tag_min.indexOf('\\');
 	indexOfBackslash<0 || throwPosError(tagName.pos + indexOfBackslash, `tag name should better not contain UnicodeEscapeSequence`);
 	node.typeArguments && tagName.end + 1!==node.typeArguments.pos && throwPosError(tagName.pos - 1, `whitespaces and comments should better not appear between tag name and type argument`);
-	const start = generateStart(tag_min, tagName.pos);
+	const start = generateStart(tag_min, {
+		index: tagName.pos,
+		path: filename,
+		code: ts,
+		type: ts[tagName.end]==='<',
+	});
 	if ( typeof start!=='string' ) { throw TypeError$1(`transpileModule(,jsx) must return a string`); }
 	switch ( start[start.length - 1] ) {
 		case ',': break;
