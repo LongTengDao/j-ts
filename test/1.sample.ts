@@ -65,15 +65,12 @@ var VAR1 ,
 	VAR4 : (1) = 1 ;
 
 var IMPORT :import('');
-declare module '' { export = a; type a = any; }
+declare module MODULE { export type a = any ; }
+declare namespace NAMESPACE { export type a = any ; }
 
 type TYPE = any ;
 
 interface INTERFACE { }
-
-namespace NAMESPACE { }
-
-module MODULE { }
 
 a => a ;
 

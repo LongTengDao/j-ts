@@ -115,7 +115,6 @@ export const ChildNodes = (node :Node) :ChildNodes | null => {
 	}
 	finally { childNodes = null; }
 };
-export const ChildNodeN = (node :Node, n :number) :Node | undefined => deps.forEachChild(node as any, (node :Node) => n ? void --n : node);
 const CHILDREN = [] as const;
 export const Children = (node :Node) :Children => {
 	let ts_index = node.pos;

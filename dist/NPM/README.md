@@ -48,7 +48,7 @@ function* f(v) {
 |                                                                       | `typescript` | `@ltd/j-ts`  |              <kbd>Alt</kbd>               |
 |-----------------------------------------------------------------------|:------------:|:------------:|-------------------------------------------|
 | `public` / `protected` / `private` / `readonly` constructor parameter |      ✓      |      ✗      | ECMAScript class field                    |
-| `enum $ { }`                                                          |      ✓      |      ✗      | `import * as $ from '';`                  |
+| `enum $ { }` / `namespace $ { }` / `module $ { }`                     |      ✓      |      ✗      | `import * as $ from '';`                  |
 | `import $ = require('');`                                             |      ✓      |      ✗      | `var $ :typeof import('') = require('');` |
 | `export = $;`                                                         |      ✓      |      ✗      | `module.exports = $;`                     |
 | `@$`                                                                  |      ✓      |      ✗      | wait ECMAScript decorator proposal        |

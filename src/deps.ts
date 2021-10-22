@@ -130,5 +130,8 @@ export type ClassExpression = ts.ClassExpression;
 export type ArrowFunction = ts.ArrowFunction;
 export type PropertyDeclaration = ts.PropertyDeclaration;
 export type VariableDeclaration = ts.VariableDeclaration;
+export type ModuleDeclaration = ts.ModuleDeclaration;
+export type EnumDeclaration = ts.EnumDeclaration;
+export type ImportEqualsDeclaration = ts.ImportEqualsDeclaration;
 
 import type * as ts from 'typescript';

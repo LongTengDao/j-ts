@@ -1,4 +1,5 @@
 import * as deps from '../../deps';
+import * as ing from '../ing';
 import * as util from '../util';
 import * as TSX from '../TSX/';
 
@@ -15,7 +16,6 @@ function * erase (this :void, node :util.Node) :Generator<string, void, void> {
 		//case NamespaceExportDeclaration:
 		case deps.TypeAliasDeclaration:
 		case deps.InterfaceDeclaration:
-		case deps.ModuleDeclaration:
 		//case deps.ProtectedKeyword:
 		//case deps.ReadonlyKeyword:
 		//case deps.PrivateKeyword:
@@ -26,9 +26,11 @@ function * erase (this :void, node :util.Node) :Generator<string, void, void> {
 		//case deps.OverrideKeyword:
 			return yield util.eraseRange(node);
 		case deps.EnumDeclaration:
-			throw util.throwPosError(util.ChildNodeN(node, 0)!.pos - 4, `"enum" is not supported while transpileModule`);
+			const { name } = node as deps.EnumDeclaration;
+			throw util.throwPosError(name ? name.pos - 4 : util.RealPos(node), `"enum" is not supported while transpileModule`);
 		case deps.ImportEqualsDeclaration:
-			throw util.throwPosError(util.ChildNodeN(node, 1)!.pos - 1, `@ltd/j-ts does not support "import="`);
+			const { moduleReference } = node as deps.ImportEqualsDeclaration;
+			throw util.throwPosError(moduleReference ? moduleReference.pos - 1 : util.RealPos(node), `@ltd/j-ts does not support "import="`);
 		case deps.ImportDeclaration:
 			if ( ( node as deps.ImportDeclaration ).importClause?.isTypeOnly ) { return yield util.eraseRange(node); }
 			break;
@@ -36,15 +38,25 @@ function * erase (this :void, node :util.Node) :Generator<string, void, void> {
 			if ( ( node as deps.ExportDeclaration ).isTypeOnly ) { return yield util.eraseRange(node); }
 			break;
 		case deps.ExportAssignment:
-			( node as deps.ExportAssignment ).isExportEquals && util.throwPosError(( node as deps.ExportAssignment ).pos - 1, `@ltd/j-ts does not support "export="`);
+			if ( ( node as deps.ExportAssignment ).isExportEquals ) {
+				const { expression } = node as deps.ExportAssignment;
+				util.throwPosError(expression ? expression.pos - 1 : util.RealPos(node), `@ltd/j-ts does not support "export="`);
+			}
 			break;
 		case deps.Parameter:
-			( node as deps.ParameterDeclaration ).modifiers && util.throwPosError(util.RealPos(( node as deps.ParameterDeclaration ).name), `@ltd/j-ts does not support parameter property (readonly / public / protected / private / override)`);
+			( node as deps.ParameterDeclaration ).modifiers && util.throwPosError(util.RealPos(( node as deps.ParameterDeclaration ).name ?? node), `@ltd/j-ts does not support parameter property (readonly / public / protected / private / override)`);
 			break;
 	}
 	if ( node.modifiers ) { for ( const modifier of node.modifiers ) { if ( modifier.kind===deps.DeclareKeyword ) { return yield util.eraseRange(node); } } }
 	node.decorators && util.throwPosError(util.RealPos(node.decorators), `@ltd/j-ts can not handle decorator`);
 	switch ( node.kind ) {
+		case deps.ModuleDeclaration:
+			const { name } = node as deps.ModuleDeclaration;
+			throw name
+				? ing.ts.endsWith('module', name.pos)
+					? util.throwPosError(name.pos - 6, `@ltd/j-ts does not support "module" (before ECMAScript proposal finished)`)
+					: util.throwPosError(name.pos - 9, `@ltd/j-ts does not support "namespace"`)
+				: util.throwPosError(util.RealPos(node), `@ltd/j-ts does not support "module" (before ECMAScript proposal finished) and "namespace"`);
 		case deps.CallExpression:
 		case deps.NewExpression:
 		case deps.TaggedTemplateExpression:
