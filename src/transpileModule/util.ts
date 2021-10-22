@@ -43,14 +43,14 @@ export const min = (a :number, b :number) => a<b ? a : b;
 export const slice = (start :number, end? :number) => ing.ts.slice(start, end);
 export const codeOf = (range :deps.ReadonlyTextRange) => ing.ts.slice(range.pos, range.end);
 
-export const throwPosError = (pos :number, message :string) :never => {
+export const throwPosError = (index :number, message :string) :never => {
 	if ( ing.filename!==undefined ) {
-		const linesBeforeError = ing.ts.slice(0, pos).split(EOL);
+		const linesBeforeError = ing.ts.slice(0, index).split(EOL);
 		const errorLineNumber = linesBeforeError.length;
 		message += `\n    at (${ing.filename}:${errorLineNumber}:${linesBeforeError[errorLineNumber - 1]!.length + 1})`;
 	}
-	const error :Error & { pos? :number } = Error(message);
-	error.pos = pos;
+	const error :Error & { index? :number } = Error(message);
+	error.index = index;
 	throw error;
 };
 

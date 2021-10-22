@@ -20,7 +20,7 @@ npm install @ltd/j-ts
 	
 ```
 
-### `require('@ltd/j-ts')(input :string, jsx :( (name :string) => string ) | boolean = false, fileName? :string)`
+### `require('@ltd/j-ts')(input :string, jsx :( (name :string, context :object) => string ) | boolean = false, fileName? :string)`
 
 ```JavaScript
 	             
@@ -31,10 +31,10 @@ npm install @ltd/j-ts
 	
 ```
 
-(The error thrown for `input` will have a `pos :number` property.)  
-（对 `input` 抛出的错误，会带上 `pos :number` 属性。）  
+(The error thrown for `input` will have a `index :number` property.)  
+（对 `input` 抛出的错误，会带上 `index :number` 属性。）  
 
-### `require('typescript').transpileModule(input :string, options).outputText`
+### `require('typescript').transpileModule(input :string, options :object).outputText`
 
 ```JavaScript
 function* f(v) {

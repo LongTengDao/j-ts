@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '8.0.0';
+const version$1 = '9.0.0';
 
 const TypeError$1 = TypeError;
 
@@ -164,14 +164,14 @@ const min = (a        , b        ) => a<b ? a : b;
 const slice = (start        , end         ) => ts.slice(start, end);
 const codeOf = (range                        ) => ts.slice(range.pos, range.end);
 
-const throwPosError = (pos        , message        )        => {
+const throwPosError = (index        , message        )        => {
 	if ( filename!==undefined$1 ) {
-		const linesBeforeError = ts.slice(0, pos).split(EOL$1);
+		const linesBeforeError = ts.slice(0, index).split(EOL$1);
 		const errorLineNumber = linesBeforeError.length;
 		message += `\n    at (${filename}:${errorLineNumber}:${linesBeforeError[errorLineNumber - 1] .length + 1})`;
 	}
-	const error                           = Error$1(message);
-	error.pos = pos;
+	const error                             = Error$1(message);
+	error.index = index;
 	throw error;
 };
 
@@ -980,8 +980,6 @@ const resetIfNewline = (code        ) => {
 	if ( credit && INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-let $jsx                    ;
-let $jsxFrag                    ;
 const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
 const Along = (along        )         => {
 	const parts = along.split('.');
@@ -997,15 +995,15 @@ const readJSX = () => {
 		const _$ = jsx$_$(at.slice(1));
 		if ( _$ ) {
 			if ( at[4]==='F' ) {
-				if ( $jsxFrag===undefined$1 ) {
-					$jsxFrag = Along(_$[1] );
-					if ( $jsx!==undefined$1 ) { break; }
+				if ( jsxFragmentFactory===undefined$1 ) {
+					jsxFragmentFactory = Along(_$[1] );
+					if ( jsxFactory!==undefined$1 ) { break; }
 				}
 			}
 			else {
-				if ( $jsx===undefined$1 ) {
-					$jsx = Along(_$[1] );
-					if ( $jsxFrag!==undefined$1 ) { break; }
+				if ( jsxFactory===undefined$1 ) {
+					jsxFactory = Along(_$[1] );
+					if ( jsxFragmentFactory!==undefined$1 ) { break; }
 				}
 			}
 		}
@@ -1024,7 +1022,7 @@ const GENERATE_START                = (value, { index, type }) =>
 let generateStart                = GENERATE_START;
 
 const off$1 = ()       => {
-	$jsx = $jsxFrag = jsxFactory = jsxFragmentFactory = undefined$1;
+	jsxFactory = jsxFragmentFactory = undefined$1;
 	generateStart = GENERATE_START;
 };
                                                             
@@ -1032,6 +1030,8 @@ const off$1 = ()       => {
 	                        
 	            
 	             
+	                        
+	                        
                                             
 const on = (jsx               )       => {
 	readJSX();
@@ -1045,8 +1045,7 @@ const on = (jsx               )       => {
 const on$ = (compilerOptions                 )       => {
 	readJSX();
 	let reactNamespace                    ;
-	if ( $jsx ) { jsxFactory = $jsx; }
-	else {
+	if ( !jsxFactory ) {
 		jsxFactory = compilerOptions?.jsxFactory;
 		if ( jsxFactory===undefined$1 ) {
 			reactNamespace = compilerOptions?.reactNamespace;
@@ -1056,8 +1055,7 @@ const on$ = (compilerOptions                 )       => {
 		}
 		else if ( typeof jsxFactory!=='string' ) { throw TypeError$1(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
 	}
-	if ( $jsxFrag ) { jsxFragmentFactory = $jsxFrag; }
-	else {
+	if ( !jsxFragmentFactory ) {
 		jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
 		if ( jsxFragmentFactory===undefined$1 ) {
 			if ( reactNamespace===undefined$1 ) {
@@ -1097,6 +1095,8 @@ function * FragmentGenerator (            node                  , reset         
 		path: filename,
 		code: ts,
 		type: false,
+		main: jsxFactory,
+		frag: jsxFragmentFactory,
 	});
 	if ( typeof start!=='string' ) { throw TypeError$1(`transpileModule(,jsx) must return a string`); }
 	let needComma = true;
@@ -1165,6 +1165,8 @@ function * Opening (            node                                            
 		path: filename,
 		code: ts,
 		type: ts[tagName.end]==='<',
+		main: jsxFactory,
+		frag: jsxFragmentFactory,
 	});
 	if ( typeof start!=='string' ) { throw TypeError$1(`transpileModule(,jsx) must return a string`); }
 	switch ( start[start.length - 1] ) {

@@ -47,8 +47,6 @@ const resetIfNewline = (code :string) => {
 	if ( credit && util.INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-let $jsx :string | undefined;
-let $jsxFrag :string | undefined;
 const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)/);
 const Along = (along :string) :string => {
 	const parts = along.split('.');
@@ -64,15 +62,15 @@ const readJSX = () => {
 		const _$ = jsx$_$(at.slice(1));
 		if ( _$ ) {
 			if ( at[4]==='F' ) {
-				if ( $jsxFrag===undefined ) {
-					$jsxFrag = Along(_$[1]!);
-					if ( $jsx!==undefined ) { break; }
+				if ( jsxFragmentFactory===undefined ) {
+					jsxFragmentFactory = Along(_$[1]!);
+					if ( jsxFactory!==undefined ) { break; }
 				}
 			}
 			else {
-				if ( $jsx===undefined ) {
-					$jsx = Along(_$[1]!);
-					if ( $jsxFrag!==undefined ) { break; }
+				if ( jsxFactory===undefined ) {
+					jsxFactory = Along(_$[1]!);
+					if ( jsxFragmentFactory!==undefined ) { break; }
 				}
 			}
 		}
@@ -91,7 +89,7 @@ const GENERATE_START :GenerateStart = (value, { index, type }) =>
 let generateStart :GenerateStart = GENERATE_START;
 
 export const off = () :void => {
-	$jsx = $jsxFrag = jsxFactory = jsxFragmentFactory = undefined;
+	jsxFactory = jsxFragmentFactory = undefined;
 	generateStart = GENERATE_START;
 };
 export type GenerateStart = (this :void, name :string, {} :{
@@ -99,6 +97,8 @@ export type GenerateStart = (this :void, name :string, {} :{
 	path :string | undefined
 	code :string
 	type :boolean
+	main :string | undefined
+	frag :string | undefined
 }) => `${string}(${string},` | `${string}(`;
 export const on = (jsx :GenerateStart) :void => {
 	readJSX();
@@ -112,8 +112,7 @@ export type CompilerOptions = {
 export const on$ = (compilerOptions :CompilerOptions) :void => {
 	readJSX();
 	let reactNamespace :string | undefined;
-	if ( $jsx ) { jsxFactory = $jsx; }
-	else {
+	if ( !jsxFactory ) {
 		jsxFactory = compilerOptions?.jsxFactory;
 		if ( jsxFactory===undefined ) {
 			reactNamespace = compilerOptions?.reactNamespace;
@@ -123,8 +122,7 @@ export const on$ = (compilerOptions :CompilerOptions) :void => {
 		}
 		else if ( typeof jsxFactory!=='string' ) { throw TypeError(`transpileModule(,{compilerOptions:{jsx:'react',jsxFactory:!string}})`); }
 	}
-	if ( $jsxFrag ) { jsxFragmentFactory = $jsxFrag; }
-	else {
+	if ( !jsxFragmentFactory ) {
 		jsxFragmentFactory = compilerOptions?.jsxFragmentFactory;
 		if ( jsxFragmentFactory===undefined ) {
 			if ( reactNamespace===undefined ) {
@@ -164,6 +162,8 @@ function * FragmentGenerator (this :void, node :deps.JsxFragment, reset :boolean
 		path: ing.filename,
 		code: ing.ts,
 		type: false,
+		main: jsxFactory,
+		frag: jsxFragmentFactory,
 	});
 	if ( typeof start!=='string' ) { throw TypeError(`transpileModule(,jsx) must return a string`); }
 	let needComma = true;
@@ -232,6 +232,8 @@ function * Opening (this :void, node :deps.JsxSelfClosingElement | deps.JsxOpeni
 		path: ing.filename,
 		code: ing.ts,
 		type: ing.ts[tagName.end]==='<',
+		main: jsxFactory,
+		frag: jsxFragmentFactory,
 	});
 	if ( typeof start!=='string' ) { throw TypeError(`transpileModule(,jsx) must return a string`); }
 	switch ( start[start.length - 1] ) {
