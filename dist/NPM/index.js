@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '9.0.2';
+const version$1 = '9.0.3';
 
 const TypeError$1 = TypeError;
 
@@ -145,7 +145,7 @@ const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
 	re.test = test;
 	return re;
 } )();
-const AT$_$ = /@\S+\s+.*/g;
+const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
 function * readAT (          )                                {
 	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
 	while ( LEADING_WHITESPACE_OR_COMMENT.test(ts) ) {

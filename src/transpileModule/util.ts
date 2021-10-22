@@ -24,7 +24,7 @@ const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
 	re.test = test;
 	return re;
 } )();
-const AT$_$ = /@\S+\s+.*/g;
+const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
 export function * readAT (this :void) :Generator<string, void, void> {
 	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
 	while ( LEADING_WHITESPACE_OR_COMMENT.test(ing.ts) ) {
