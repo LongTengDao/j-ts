@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '9.0.3';
+const version$1 = '10.0.0';
 
 const TypeError$1 = TypeError;
 
@@ -140,25 +140,6 @@ const FIRST_MAYBE_SECOND_WHITESPACE = /^[^\n\r/\u2028\u2029]{1,2}/;
 const TAB_INDENT = /^(?:[\n\r\u2028\u2029]\t*)+/;
 const SPACE_INDENT = /^(?:[\n\r\u2028\u2029] *)+/;
 
-const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
-	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
-	re.test = test;
-	return re;
-} )();
-const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
-function * readAT (          )                                {
-	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
-	while ( LEADING_WHITESPACE_OR_COMMENT.test(ts) ) {
-		if ( ts.startsWith('/*', lastIndex) ) {
-			const all = ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2).match(AT$_$);
-			if ( all ) {
-				for ( const each of all ) { yield each; }
-			}
-		}
-		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
-	}
-}
-
 const min = (a        , b        ) => a<b ? a : b;
 
 const slice = (start        , end         ) => ts.slice(start, end);
@@ -174,6 +155,35 @@ const throwPosError = (index        , message        )        => {
 	error.index = index;
 	throw error;
 };
+
+const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
+	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
+	re.test = test;
+	return re;
+} )();
+const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
+function * readAT                   (            exec                                          )                           {
+	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
+	while ( LEADING_WHITESPACE_OR_COMMENT.test(ts) ) {
+		if ( ts[lastIndex]==='/' ) {
+			const all = ( ts[lastIndex + 1]==='/'
+					? ts.slice(lastIndex + 2)
+					: ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2)
+			).match(AT$_$);
+			if ( all ) {
+				const valid = ts.startsWith('/**', lastIndex) && ts[lastIndex + 3]!=='*';
+				for ( const each of all ) {
+					const _$ = exec(each.slice(1));
+					if ( _$ ) {
+						valid || throwPosError(lastIndex, `a JSDoc comment should start with "/**"`);
+						yield _$;
+					}
+				}
+			}
+		}
+		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
+	}
+}
 
 const S = /\S/g;
 const eraseCode = (code        ) => code.replace(S, ' ');
@@ -979,32 +989,27 @@ const resetIfNewline = (code        ) => {
 	if ( credit && INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/);
-const Along = (along        )         => {
-	const parts = along.split('.');
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/)                                                                     ;
+const Along = (value        )         => {
+	const parts = value.split('.');
+	isIdentifier(parts[0] ) || throwPosError(0, `@jsx(Frag) value is not valid`);
 	if ( !isIdentifier(parts[0] ) ) { return ''; }
 	let index = parts.length;
-	while ( --index ) {
-		if ( !isIdentifierName(parts[index] ) ) { return ''; }
-	}
-	return along;
+	while ( --index ) { isIdentifierName(parts[index] ) || throwPosError(0, `@jsx(Frag) value is not valid`); }
+	return value;
 };
 const readJSX = () => {
-	for ( const at of readAT() ) {
-		const _$ = jsx$_$(at.slice(1));
-		if ( _$ ) {
-			if ( at[4]==='F' ) {
-				if ( jsxFragmentFactory===undefined$1 ) {
-					jsxFragmentFactory = _$[2] ? Along(_$[1] ) : '';
-					if ( jsxFactory!==undefined$1 ) { break; }
-				}
-			}
-			else {
-				if ( jsxFactory===undefined$1 ) {
-					jsxFactory = _$[2] ? Along(_$[1] ) : '';
-					if ( jsxFragmentFactory!==undefined$1 ) { break; }
-				}
-			}
+	for ( const { 0: name_value_, 1: value, 2: valid } of readAT                            (jsx$_$) ) {
+		valid || throwPosError(0, `there should be at least one whitespace after JSDoc value`);
+		if ( name_value_[3]==='F' ) {
+			jsxFragmentFactory===undefined$1 || throwPosError(0, `there should not be more than one @jsxFrag`);
+			jsxFragmentFactory = Along(value);
+			if ( jsxFactory!==undefined$1 ) { break; }
+		}
+		else {
+			jsxFactory===undefined$1 || throwPosError(0, `there should not be more than one @jsx`);
+			jsxFactory = Along(value);
+			if ( jsxFragmentFactory!==undefined$1 ) { break; }
 		}
 	}
 };

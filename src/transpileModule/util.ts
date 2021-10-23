@@ -19,25 +19,6 @@ export const FIRST_MAYBE_SECOND_WHITESPACE = /^[^\n\r/\u2028\u2029]{1,2}/;
 export const TAB_INDENT = /^(?:[\n\r\u2028\u2029]\t*)+/;
 export const SPACE_INDENT = /^(?:[\n\r\u2028\u2029] *)+/;
 
-const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
-	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
-	re.test = test;
-	return re;
-} )();
-const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
-export function * readAT (this :void) :Generator<string, void, void> {
-	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
-	while ( LEADING_WHITESPACE_OR_COMMENT.test(ing.ts) ) {
-		if ( ing.ts.startsWith('/*', lastIndex) ) {
-			const all = ing.ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2).match(AT$_$);
-			if ( all ) {
-				for ( const each of all ) { yield each; }
-			}
-		}
-		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
-	}
-}
-
 export const min = (a :number, b :number) => a<b ? a : b;
 
 export const slice = (start :number, end? :number) => ing.ts.slice(start, end);
@@ -53,6 +34,35 @@ export const throwPosError = (index :number, message :string) :never => {
 	error.index = index;
 	throw error;
 };
+
+const LEADING_WHITESPACE_OR_COMMENT = /*#__PURE__*/( () => {
+	const re = /\s+|\/(?:\/.*|\*[^]*?\*\/)/y;
+	re.test = test;
+	return re;
+} )();
+const AT$_$ = /@\S+\s+.*(?:$|[\n\r\u2028\u2029])/g;
+export function * readAT<T extends object> (this :void, exec :(this :void, string :string) => T | null) :Generator<T, void, void> {
+	let lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex = 0;
+	while ( LEADING_WHITESPACE_OR_COMMENT.test(ing.ts) ) {
+		if ( ing.ts[lastIndex]==='/' ) {
+			const all = ( ing.ts[lastIndex + 1]==='/'
+					? ing.ts.slice(lastIndex + 2)
+					: ing.ts.slice(lastIndex + 2, LEADING_WHITESPACE_OR_COMMENT.lastIndex - 2)
+			).match(AT$_$);
+			if ( all ) {
+				const valid = ing.ts.startsWith('/**', lastIndex) && ing.ts[lastIndex + 3]!=='*';
+				for ( const each of all ) {
+					const _$ = exec(each.slice(1));
+					if ( _$ ) {
+						valid || throwPosError(lastIndex, `a JSDoc comment should start with "/**"`);
+						yield _$;
+					}
+				}
+			}
+		}
+		lastIndex = LEADING_WHITESPACE_OR_COMMENT.lastIndex;
+	}
+}
 
 const S = /\S/g;
 export const eraseCode = (code :string) => code.replace(S, ' ');

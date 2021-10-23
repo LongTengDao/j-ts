@@ -47,32 +47,27 @@ const resetIfNewline = (code :string) => {
 	if ( credit && util.INCLUDES_EOL(code) ) { credit = 0; }
 };
 
-const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/);
-const Along = (along :string) :string => {
-	const parts = along.split('.');
+const jsx$_$ = /*#__PURE__*/exec.bind(/^jsx(?:Frag)?\s+(\S*)(\s?)/) as (this :void, string :string) => [ string, string, string ] | null;
+const Along = (value :string) :string => {
+	const parts = value.split('.');
+	isIdentifier(parts[0]!) || util.throwPosError(0, `@jsx(Frag) value is not valid`);
 	if ( !isIdentifier(parts[0]!) ) { return ''; }
 	let index = parts.length;
-	while ( --index ) {
-		if ( !isIdentifierName(parts[index]!) ) { return ''; }
-	}
-	return along;
+	while ( --index ) { isIdentifierName(parts[index]!) || util.throwPosError(0, `@jsx(Frag) value is not valid`); }
+	return value;
 };
 const readJSX = () => {
-	for ( const at of util.readAT() ) {
-		const _$ = jsx$_$(at.slice(1));
-		if ( _$ ) {
-			if ( at[4]==='F' ) {
-				if ( jsxFragmentFactory===undefined ) {
-					jsxFragmentFactory = _$[2] ? Along(_$[1]!) : '';
-					if ( jsxFactory!==undefined ) { break; }
-				}
-			}
-			else {
-				if ( jsxFactory===undefined ) {
-					jsxFactory = _$[2] ? Along(_$[1]!) : '';
-					if ( jsxFragmentFactory!==undefined ) { break; }
-				}
-			}
+	for ( const { 0: name_value_, 1: value, 2: valid } of util.readAT<[ string, string, string ]>(jsx$_$) ) {
+		valid || util.throwPosError(0, `there should be at least one whitespace after JSDoc value`);
+		if ( name_value_[3]==='F' ) {
+			jsxFragmentFactory===undefined || util.throwPosError(0, `there should not be more than one @jsxFrag`);
+			jsxFragmentFactory = Along(value);
+			if ( jsxFactory!==undefined ) { break; }
+		}
+		else {
+			jsxFactory===undefined || util.throwPosError(0, `there should not be more than one @jsx`);
+			jsxFactory = Along(value);
+			if ( jsxFragmentFactory!==undefined ) { break; }
 		}
 	}
 };
