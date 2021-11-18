@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version$1 = '10.0.0';
+const version = '10.1.0';
 
 const TypeError$1 = TypeError;
 
@@ -93,6 +93,8 @@ const {
 	ExportKeyword,
 	ConstKeyword,///
 	DefaultKeyword,///
+	NamedImports,
+	NamedExports,
 } = SyntaxKind;
 
 const Error$1 = Error;
@@ -131,7 +133,7 @@ const apply = Reflect.apply;
 let erase$2                                                           ;
 const set_erase =                                                                       (value   )    => erase$2 = value;
 
-const EOL$1 = /\r\n?|[\n\u2028\u2029]/;
+const EOL = /\r\n?|[\n\u2028\u2029]/;
 const INDEX_OF_EOL = /[\n\r\u2028\u2029]/;
 const INCLUDES_EOL = /*#__PURE__*/test.bind(INDEX_OF_EOL);
 const WHITESPACES_AND_COMMENT = /\s|\/(?:\/.*|\*[^]*?\*\/)/gy;
@@ -147,7 +149,7 @@ const codeOf = (range                        ) => ts.slice(range.pos, range.end)
 
 const throwPosError = (index        , message        )        => {
 	if ( filename!==undefined$1 ) {
-		const linesBeforeError = ts.slice(0, index).split(EOL$1);
+		const linesBeforeError = ts.slice(0, index).split(EOL);
 		const errorLineNumber = linesBeforeError.length;
 		message += `\n    at (${filename}:${errorLineNumber}:${linesBeforeError[errorLineNumber - 1] .length + 1})`;
 	}
@@ -440,96 +442,24 @@ const exec = RegExp.prototype.exec;
 
 const bind = Function.prototype.bind;
 
-const RegExp$1 = RegExp;
-
-const Infinity = 1/0;
-
-const Object$1 = Object;
-
-const throwError = (
-	/*! j-globals: throw.Error (internal) */
-	function throwError (message) {
-		throw Error$1(message);
-	}
-	/*¡ j-globals: throw.Error (internal) */
-);
-
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-const toString = Object.prototype.toString;
-
-const isArray = (
-	/*! j-globals: Array.isArray (polyfill) */
-	Array.isArray || function isArray (value) {
-		return /*#__PURE__*/ toString.apply(value)==='[object Array]';
-	}
-	/*¡ j-globals: Array.isArray (polyfill) */
-);
-
-const has$1 = typeof Map==='undefined' ? undefined$1 : Map.prototype.has;
-
 const NULL = (
-	/*! j-globals: null.prototype (internal) */
+	/* j-globals: null.prototype (internal) */
 	Object.seal
 		? /*#__PURE__*/Object.preventExtensions(Object.create(null))
 		: null
-	/*¡ j-globals: null.prototype (internal) */
+	/* j-globals: null.prototype (internal) */
 );
 
-var ARGS$1 = { length: 0 };
-var hasOwn = /*#__PURE__*/function () {
-	return hasOwnProperty.bind
-		? hasOwnProperty.call.bind(hasOwnProperty)
-		: function (object, key) { return hasOwnProperty.call(object, key); };
-}();// && object!=null
-
-const isMap = (
-	/*! j-globals: class.isMap (internal) */
-	has$1
-		? function isMap (value) {
-			try { apply(has$1, value, ARGS$1); }
-			catch (error) { return false; }
-			return true;
-		}
-		: function isMap () { return false; }
-	/*¡ j-globals: class.isMap (internal) */
-);
-
-const has = typeof Set==='undefined' ? undefined$1 : Set.prototype.has;
-
-const isSet = (
-	/*! j-globals: class.isSet (internal) */
-	has
-		? function isSet (value) {
-			try { apply(has, value, ARGS$1); }
-			catch (error) { return false; }
-			return true;
-		}
-		: function isSet () { return false; }
-	/*¡ j-globals: class.isSet (internal) */
-);
-
-const valueOf = Date.prototype.valueOf;
-
-const isDate = (
-	/*! j-globals: class.isDate (internal) */
-	function isDate (value) {
-		try { apply(valueOf, value, ARGS$1); }
-		catch (error) { return false; }
-		return true;
-	}
-	/*¡ j-globals: class.isDate (internal) */
-);
-
-var ARGS = { length: 1, 0: '' };
-const isRegExp = (
-	/*! j-globals: class.isRegExp (internal) */
-	function isRegExp (value) {
-		try { apply(test, value, ARGS); }
-		catch (error) { return false; }
-		return true;
-	}
-	/*¡ j-globals: class.isRegExp (internal) */
+var hasOwn = (
+	/* j-globals: Object.hasOwn (polyfill) */
+	Object.hasOwn || /*#__PURE__*/function () {
+		return hasOwnProperty.bind
+			? hasOwnProperty.call.bind(hasOwnProperty)
+			: function hasOwn (object, key) { return hasOwnProperty.call(object, key); };
+	}()
+	/* j-globals: Object.hasOwn (polyfill) */
 );
 
 const create = Object.create;
@@ -543,7 +473,7 @@ const freeze = Object.freeze;
 const assign = Object.assign;
 
 const Default = (
-	/*! j-globals: default (internal) */
+	/* j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
 		if ( !addOnOrigin ) { addOnOrigin = exports; exports = create(NULL); }
 		if ( assign ) { assign(exports, addOnOrigin); }
@@ -557,7 +487,7 @@ const Default = (
 		typeof exports==='function' && exports.prototype && freeze(exports.prototype);
 		return freeze(exports);
 	}
-	/*¡ j-globals: default (internal) */
+	/* j-globals: default (internal) */
 );
 
 /*!@preserve@license
@@ -571,8 +501,6 @@ const Default = (
  * 项目主页：https://GitHub.com/LongTengDao/j-es/
  */
 
-var version = '0.12.0';
-
 var RESERVED_WORD_ES3 = /^(?:break|c(?:a(?:se|tch)|lass|on(?:st|tinue))|d(?:o|e(?:bugger|fault|lete))|e(?:lse|num|x(?:port|tends))|f(?:alse|inally|or|unction)|i(?:f|mport|n(?:stanceof)?)|n(?:ew|ull)|return|s(?:uper|witch)|t(?:h(?:is|row)|r(?:y|ue)|ypeof)|v(?:ar|oid)|w(?:hile|ith))$/;
 
 var RESERVED_WORD_ESM = /^(?:arguments|break|c(?:a(?:se|tch)|lass|on(?:st|tinue))|d(?:o|e(?:bugger|fault|lete))|e(?:lse|num|val|x(?:port|tends))|f(?:alse|inally|or|unction)|i(?:f|mp(?:lements|ort)|n(?:stanceof|terface)?)|let|n(?:ew|ull)|p(?:ackage|r(?:ivate|otected)|ublic)|return|s(?:tatic|uper|witch)|t(?:h(?:is|row)|r(?:y|ue)|ypeof)|v(?:ar|oid)|w(?:hile|ith)|yield)$/;
@@ -584,15 +512,6 @@ var IDENTIFIER_NAME_ES5 = /^[\$A-Z_a-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u021F\
 var IDENTIFIER_NAME_ES3 = /^[\$A-Z_a-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u01F5\u01FA-\u0217\u0250-\u02A8\u02B0-\u02B8\u02BB-\u02C1\u02D0\u02D1\u02E0-\u02E4\u037A\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03CE\u03D0-\u03D6\u03DA\u03DC\u03DE\u03E0\u03E2-\u03F3\u0401-\u040C\u040E-\u044F\u0451-\u045C\u045E-\u0481\u0490-\u04C4\u04C7\u04C8\u04CB\u04CC\u04D0-\u04EB\u04EE-\u04F5\u04F8\u04F9\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0621-\u063A\u0640-\u064A\u0671-\u06B7\u06BA-\u06BE\u06C0-\u06CE\u06D0-\u06D3\u06D5\u06E5\u06E6\u0905-\u0939\u093D\u0950\u0958-\u0961\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8B\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B36-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB5\u0BB7-\u0BB9\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C60\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CDE\u0CE0\u0CE1\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D28\u0D2A-\u0D39\u0D60\u0D61\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC\u0EDD\u0F00\u0F40-\u0F47\u0F49-\u0F69\u0F88-\u0F8B\u10A0-\u10C5\u10D0-\u10F6\u1100-\u1159\u115F-\u11A2\u11A8-\u11F9\u1E00-\u1E9B\u1EA0-\u1EF9\u1F00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u207F\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u2131\u2133-\u2138\u2160-\u2182\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3041-\u3094\u309D\u309E\u30A1-\u30FA\u30FC-\u30FE\u3105-\u312C\u3131-\u318E\u4E00-\u9FA5\uAC00-\uD7A3\uF900-\uFA2D\uFB00-\uFB06\uFB13-\uFB17\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE72\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC][\$0-9A-Z_a-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u01F5\u01FA-\u0217\u0250-\u02A8\u02B0-\u02B8\u02BB-\u02C1\u02D0\u02D1\u02E0-\u02E4\u0300-\u0345\u0360\u0361\u037A\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03CE\u03D0-\u03D6\u03DA\u03DC\u03DE\u03E0\u03E2-\u03F3\u0401-\u040C\u040E-\u044F\u0451-\u045C\u045E-\u0481\u0483-\u0486\u0490-\u04C4\u04C7\u04C8\u04CB\u04CC\u04D0-\u04EB\u04EE-\u04F5\u04F8\u04F9\u0531-\u0556\u0559\u0561-\u0587\u0591-\u05A1\u05A3-\u05B9\u05BB-\u05BD\u05BF\u05C1\u05C2\u05C4\u05D0-\u05EA\u05F0-\u05F2\u0621-\u063A\u0640-\u0652\u0660-\u0669\u0670-\u06B7\u06BA-\u06BE\u06C0-\u06CE\u06D0-\u06D3\u06D5-\u06DC\u06DF-\u06E8\u06EA-\u06ED\u06F0-\u06F9\u0901-\u0903\u0905-\u0939\u093C-\u094D\u0950-\u0954\u0958-\u0963\u0966-\u096F\u0981-\u0983\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BC\u09BE-\u09C4\u09C7\u09C8\u09CB-\u09CD\u09D7\u09DC\u09DD\u09DF-\u09E3\u09E6-\u09F1\u0A02\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A3C\u0A3E-\u0A42\u0A47\u0A48\u0A4B-\u0A4D\u0A59-\u0A5C\u0A5E\u0A66-\u0A74\u0A81-\u0A83\u0A85-\u0A8B\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABC-\u0AC5\u0AC7-\u0AC9\u0ACB-\u0ACD\u0AD0\u0AE0\u0AE6-\u0AEF\u0B01-\u0B03\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B36-\u0B39\u0B3C-\u0B43\u0B47\u0B48\u0B4B-\u0B4D\u0B56\u0B57\u0B5C\u0B5D\u0B5F-\u0B61\u0B66-\u0B6F\u0B82\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB5\u0BB7-\u0BB9\u0BBE-\u0BC2\u0BC6-\u0BC8\u0BCA-\u0BCD\u0BD7\u0BE7-\u0BEF\u0C01-\u0C03\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3E-\u0C44\u0C46-\u0C48\u0C4A-\u0C4D\u0C55\u0C56\u0C60\u0C61\u0C66-\u0C6F\u0C82\u0C83\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBE-\u0CC4\u0CC6-\u0CC8\u0CCA-\u0CCD\u0CD5\u0CD6\u0CDE\u0CE0\u0CE1\u0CE6-\u0CEF\u0D02\u0D03\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D28\u0D2A-\u0D39\u0D3E-\u0D43\u0D46-\u0D48\u0D4A-\u0D4D\u0D57\u0D60\u0D61\u0D66-\u0D6F\u0E01-\u0E3A\u0E40-\u0E4E\u0E50-\u0E59\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB9\u0EBB-\u0EBD\u0EC0-\u0EC4\u0EC6\u0EC8-\u0ECD\u0ED0-\u0ED9\u0EDC\u0EDD\u0F00\u0F18\u0F19\u0F20-\u0F29\u0F35\u0F37\u0F39\u0F3E-\u0F47\u0F49-\u0F69\u0F71-\u0F84\u0F86-\u0F8B\u0F90-\u0F95\u0F97\u0F99-\u0FAD\u0FB1-\u0FB7\u0FB9\u10A0-\u10C5\u10D0-\u10F6\u1100-\u1159\u115F-\u11A2\u11A8-\u11F9\u1E00-\u1E9B\u1EA0-\u1EF9\u1F00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u203F\u2040\u207F\u20D0-\u20DC\u20E1\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u2131\u2133-\u2138\u2160-\u2182\u3005-\u3007\u3021-\u302F\u3031-\u3035\u3041-\u3094\u3099\u309A\u309D\u309E\u30A1-\u30FE\u3105-\u312C\u3131-\u318E\u4E00-\u9FA5\uAC00-\uD7A3\uF900-\uFA2D\uFB00-\uFB06\uFB13-\uFB17\uFB1E-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE20-\uFE23\uFE33\uFE34\uFE4D-\uFE4F\uFE70-\uFE72\uFE74\uFE76-\uFEFC\uFF10-\uFF19\uFF21-\uFF3A\uFF3F\uFF41-\uFF5A\uFF65-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]*$/;
 
 var Cf = /[\xAD\u0600-\u0605\u061C\u06DD\u070F\u08E2\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF\uFFF9-\uFFFB]|\uD804[\uDCBD\uDCCD]|\uD80D[\uDC30-\uDC38]|\uD82F[\uDCA0-\uDCA3]|\uD834[\uDD73-\uDD7A]|\uDB40[\uDC01\uDC20-\uDC7F]/g;
-
-var _Infinity = -Infinity;
-
-var is                                                = Object$1.is || function is (value        ) { return value===0 && 1/value<0; };
-function NumericLiteral (value        )         {
-	return value===Infinity || value===_Infinity || value!==value
-		? /*#__PURE__*/ throwError('NumericLiteral('+value+')')
-		: ( is(value, -0) ? '-' : '' )+value;
-}
 
 var CANT_IN_SINGLE_QUOTE = /[\n\r'\\\u2028\u2029]/g;
 function staticallyEscape (cant_in_single_quote                              )         {
@@ -626,49 +545,6 @@ function StringLiteral (value        )         {
 		+'\'';
 }
 
-var EOL = /\\[^\s\S]|[\n\r\/\u2028\u2029]/g;
-function EOL_replacer (part        ) {
-	switch ( part ) {
-		case '\n':
-		case '\\\n':
-			return '\\n';
-		case '\r':
-		case '\\\r':
-			return '\\r';
-		case '/':
-			return '\\/';
-		case '\u2028':
-		case '\\\u2028':
-			return '\\u2028';
-		case '\u2029':
-		case '\\\u2029':
-			return '\\u2029';
-	}
-	return part;
-}
-var AS_ES5 = ''+RegExp$1('')==='//' || ''+RegExp$1('/')==='///' || ''+RegExp$1('\n')==='/\n/'
-	? function AS_ES5 (literal        ) {
-		var index         = literal.length;
-		while ( literal.charAt(--index)!=='/' ) { }
-		var source         = literal.slice(1, index);
-		source = source ? source.replace(EOL, EOL_replacer) : '(?:)';
-		return '/'+source+literal.slice(index);
-	}
-	: function (literal        ) { return literal; };
-var MAYBE_ES3 = /\/[gim]*$/;
-var SLASH_NUL = /(?!^)\/(?![a-z]*$)|\x00|\\[\s\S]/g;
-function SLASH_NUL_replacer (part        ) { return part==='\x00' ? '\\x00' : part==='/' ? '\\/' : part; }
-function RegularExpressionLiteral (value        )         {
-	var literal         = AS_ES5(''+value);
-	return MAYBE_ES3.test(literal)
-		? literal.replace(Cf, dynamicallyEscape            ).replace(SLASH_NUL, SLASH_NUL_replacer)
-		: literal;
-}
-
-function BigIntLiteral (value        )         {
-	return value+'n';
-}
-
 var test_bind = bind
 	? /*#__PURE__*/ bind.bind(test)                                                                       
 	: function (            re        ) {
@@ -676,15 +552,6 @@ var test_bind = bind
 			return test.call(re, string);
 		};
 	};
-
-var IS_LIKE_SAFE_INTEGER = /*#__PURE__*/ test_bind(/^(?:0|[1-9]\d{0,15})$/);
-var IS_LIKE_ARRAY_INDEX = /*#__PURE__*/ test_bind(/^(?:0|[1-4]\d{0,9}|[5-9]\d{0,8})$/);
-function isArrayIndex (key        )          {
-	return IS_LIKE_ARRAY_INDEX(key) && key       <4294967295;
-}
-function isIntegerIndex (key        )          {
-	return IS_LIKE_SAFE_INTEGER(key) && key       <=9007199254740991;
-}
 var IS_RESERVED_WORD_ES3 = /*#__PURE__*/ test_bind(RESERVED_WORD_ES3);
 var IS_RESERVED_WORD_ESM = /*#__PURE__*/ test_bind(RESERVED_WORD_ESM);
 function isReservedWord (name        , noStrict          )          {
@@ -705,251 +572,6 @@ function isIdentifierName (name        , ES         )          {
 function isIdentifier (id        , ES         , noStrict          )          {
 	return isIdentifierName(id, ES) && !isReservedWord(id, noStrict);
 }
-function isPropertyName (key        , ES         )          {
-	return isIdentifierName(key, ES)
-		? ES >=5 || !IS_RESERVED_WORD_ES3(key)
-		: isIntegerIndex(key);
-}
-function PropertyName (key        , ES         )         {
-	return isPropertyName(key, ES) ? key : StringLiteral(key);// ['__proto__']
-}
-function PropertyAccessor (key        , ES         )         {
-	if ( isIdentifierName(key, ES) ) { if ( ES >=5 || !IS_RESERVED_WORD_ES3(key) ) { return '.' + key; } }
-	else { if ( isIntegerIndex(key) ) { return '[' + key + ']'; } }
-	return '[' + StringLiteral(key) + ']';
-}
-function PropertyAccessors (keys          , ES         )         {
-	var propertyAccessors         = '';
-	for ( var length = keys.length, index = 0; index<length; ++index ) {
-		propertyAccessors += PropertyAccessor(keys[index] , ES);
-	}
-	return propertyAccessors;
-}
-
-function Primitive                                       
-	                 
-		                   
-		                  
-		             
-	     
-		                                     
-			              
-			                                                      
-			                  
-			               
-		           
-	   (
-	value                      ,
-	key              ,
-	object        ,
-	options         
-)         {
-	switch ( value ) {
-		case null:
-			return 'null';
-		case true:
-			return 'true';
-		case false:
-			return 'false';
-		case undefined$1:
-			return options.undefined || '';
-		case Infinity:
-			return options.Infinity || '';
-		case _Infinity:
-			return options.Infinity ? '-'+options.Infinity : '';
-	}
-	if ( value!==value ) { return options.NaN || ''; }
-	switch ( typeof value ) {
-		case 'number':
-			return ( is(value, -0) ? '-' : '' )+value;
-		case 'string':
-			return StringLiteral(value);
-		case 'bigint':
-			return options.bigint ? options.bigint(value, key, object) : '';
-		case 'object':
-			return (
-				options.Array && isArray(value) ? options.Array(value, key, object) :
-					options.Map && isMap(value) ? options.Map(value, key, object) :
-						options.Set && isSet(value) ? options.Set(value, key, object) :
-							options.Date && isDate(value) ? options.Date(value, key, object) :
-								options.RegExp && isRegExp(value) ? options.RegExp(value, key, object) :
-									options.object ? options.object(value, key, object) : ''
-			);
-		case 'function':
-			return options['function'] ? options['function'](value, key, object) : '';
-		case 'symbol':
-			return options.symbol ? options.symbol(value, key, object) : '';
-	}
-	return options.unknown ? options.unknown(value, key, object) : '';
-}
-
-function ObjectLiteral (object                        , options   
-	            
-	                                          
-	                                           
-	                  
-	                                            
-	                     
-	                                           
-	                                           
-	                   
- )         {
-	var pairs           = [];
-	var pairs_length         = 0;
-	var open         = '{';
-	var close         = '}';
-	var _colon_         = ( options.key_colon || '' )+':'+( options.colon_value || '' );
-	var ES         = options.ES || 0;
-	for ( var key in object ) {
-		if ( hasOwnProperty.call(object, key) ) {
-			var value = Primitive(object[key                ], key, object, options      );
-			if ( value ) {
-				if ( key==='__proto__' && !options.__safe__ ) {
-					if ( ES>=6 ) { key = '[\'__proto__\']'       ; }
-					else {
-						open = '/*#__PURE__*/function(p,o){o.__proto__=_.p;return o}({'+( options.open_first || '' )+'p'+_colon_+value+( options.last_close || '' )+'},{';
-						close = '})';
-						value = 'null';
-					}
-				}
-				else { key = PropertyName(key, ES)       ; }
-				pairs[pairs_length++] = key+_colon_+value;
-			}
-		}
-	}
-	return open+(
-		pairs_length
-			? ( options.open_first || '' )+pairs.join(( options.value_comma || '' )+','+( options.comma_next || '' ))+( options.last_close || '' )
-			: ( options.open_close || '' )
-	)+close;
-}
-
-function ArrayLiteral (
-	array                 ,
-	options   
-		            
-		                                   
-		                                    
-		                    
-		                                    
-		                                    
-	 
-)         {
-	var items          ;
-	var length = array.length;
-	if ( length===1 ) {
-		var item = Primitive(array[0], 0, array, options      );
-		if ( item || options.ES >=5 ) { items = [ item ]; }
-		else {
-			return '/*#__PURE__*/function(){var a=['+( options.open_first || '' )+( options.last_close || '' )+'];a.length=1;return a}()';
-		}
-	}
-	else {
-		items = [];
-		for ( var index = 0; index<length; ++index ) {
-			items[index] = Primitive(array[index], index, array, options      );
-		}
-	}
-	return '['+(
-		items.length
-			? ( options.open_first || '' )+items.join(( options.item_comma || '' )+','+( options.comma_next || '' ))+( options.last_close || '' )
-			: options.open_close || ''
-	)+']';
-}
-
-var IS_SAFE = /*#__PURE__*/ test_bind(/^[`~!@#%^&*()\-=+[{\]}\\|;:'",<.>\/?\s]/);
-
-function exportify (
-	object     ,
-	options   
-		            
-		                              
-		                          
-		                     
-		                    
-		                    
-		                   
-		                     
-		                     
-		                    
-		                    
-		                         
-		                        
-		                       
-		                   
-	 
-)         {
-	if ( typeof object!=='object' || object===null || isArray(object) || isMap(object) || isSet(object) || isDate(object) || isRegExp(object) ) {
-		var $default$ = Primitive(object, undefined$1       , undefined$1       , options      );
-		if ( $default$ ) {
-			$default$ = ( options.default_value || '' ) + $default$;
-			return ( IS_SAFE($default$) ? 'export default' + $default$ : 'export default ' + $default$ ) + ( options.value_semicolon || '' ) + ';';
-		}
-		return '';
-	}
-	var ES         = options.ES || 0;
-	var gteES6          = ES>=6;
-	var export_$_ = 'export ' + ( options['let'] || ( gteES6 ? 'const' : 'var' ) ) + ' ';
-	var _equal_         = ( options.identifier_equal || '' ) + '=' + ( options.equal_value || '' );
-	var _colon_         = ( options.key_colon || '' ) + ':' + ( options.colon_value || '' );
-	var semicolon_         = ( options.value_semicolon || '' ) + ';' + ( options.semicolon_next || '' );
-	var named         = '';
-	var pairs           = [];
-	var pairs_length         = 0;
-	var open         = '{';
-	var close         = '}';
-	for ( var key in object ) {
-		if ( hasOwnProperty.call(object, key) ) {
-			var value = Primitive(object[key], key, object, options      );
-			if ( value ) {
-				if ( isIdentifier(key, ES) ) {
-					named += export_$_ + key + _equal_ + value + semicolon_;
-					if ( gteES6 ) { pairs[pairs_length++] = key; }
-					else if ( key==='__proto__' && !options.__safe__ ) {
-						open = '/*#__PURE__*/function(o){o.__proto__=__proto__;return o}({';
-						close = '})';
-						pairs[pairs_length++] = '__proto__' + _colon_ + 'null';
-					}
-					else { pairs[pairs_length++] = key + _colon_ + key; }
-				}
-				else { pairs[pairs_length++] = PropertyName(key, ES) + _colon_ + value; }
-			}
-		}
-	}
-	return named +
-		'export default' + ( options.default_value || '' ) + open + (
-			pairs_length
-				? ( options.open_first || '' ) + pairs.join(( options.value_comma || '' ) + ',' + ( options.comma_next || '' )) + ( options.last_close || '' )
-				: ( options.open_close || '' )
-		) + close + ';';
-}
-
-Default({
-	
-	version: version,
-	
-	isReservedWord: isReservedWord,
-	
-	isIdentifierName: isIdentifierName,
-	isIdentifier: isIdentifier,
-	isArrayIndex: isArrayIndex,
-	isIntegerIndex: isIntegerIndex,
-	isPropertyName: isPropertyName,
-	PropertyName: PropertyName,
-	PropertyAccessor: PropertyAccessor,
-	PropertyAccessors: PropertyAccessors,
-	
-	StringLiteral: StringLiteral,
-	NumericLiteral: NumericLiteral,
-	BigIntLiteral: BigIntLiteral,
-	RegularExpressionLiteral: RegularExpressionLiteral,
-	
-	ObjectLiteral: ObjectLiteral,
-	ArrayLiteral: ArrayLiteral,
-	
-	exportify: exportify
-	
-});
 
 /*¡ j-es */
 
@@ -1896,6 +1518,24 @@ function * erase$1 (            node           )                                
 	if ( node.modifiers ) { for ( const modifier of node.modifiers ) { if ( modifier.kind===DeclareKeyword ) { return yield eraseRange(node); } } }
 	node.decorators && throwPosError(RealPos(node.decorators), `@ltd/j-ts can not handle decorator`);
 	switch ( node.kind ) {
+		case NamedImports:
+		case NamedExports:
+			const { elements } = node                                         ;
+			let ts_index = node.pos;
+			let isTypeOnly = false;
+			for ( const element of elements ) {
+				yield isTypeOnly
+					? eraseBetween(ts_index, element.pos)
+					: slice(ts_index, element.pos);
+				( isTypeOnly = element.isTypeOnly )
+					? yield eraseRange(element)
+					: yield * erase$2(element);
+				ts_index = element.end;
+			}
+			yield isTypeOnly
+				? eraseBetween(ts_index, ts_index = elements.end) + slice(ts_index, node.end)
+				: slice(ts_index, node.end);
+			return;
 		case ModuleDeclaration:
 			const { name } = node                          ;
 			throw name
@@ -2093,7 +1733,7 @@ const transpileModule = (input        , jsx_transpileOptions
 
 const _default = Default(transpileModule, {
 	transpileModule,
-	version: version$1,
+	version,
 });
 
 module.exports = _default;

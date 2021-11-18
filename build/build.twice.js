@@ -26,7 +26,7 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 				'TypeScript 纯转译工具。从属于“简计划”。',
 			keywords: [ 'TypeScript', 'TS', 'TSX' ],
 			dependencies: {
-				'typescript': '4.4.4',
+				'typescript': '4.5.2',
 			},
 		},
 		ES: 6,

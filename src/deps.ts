@@ -85,6 +85,8 @@ export const {
 	ExportKeyword,
 	ConstKeyword,///
 	DefaultKeyword,///
+	NamedImports,
+	NamedExports,
 } = SyntaxKind;
 
 export type ReadonlyTextRange = ts.ReadonlyTextRange;
@@ -133,5 +135,7 @@ export type VariableDeclaration = ts.VariableDeclaration;
 export type ModuleDeclaration = ts.ModuleDeclaration;
 export type EnumDeclaration = ts.EnumDeclaration;
 export type ImportEqualsDeclaration = ts.ImportEqualsDeclaration;
+export type NamedImports = ts.NamedImports;
+export type NamedExports = ts.NamedExports;
 
 import type * as ts from 'typescript';

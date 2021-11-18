@@ -105,7 +105,12 @@
 ✓	AsyncKeyword	
 ✓	StaticKeyword	
 ✓	ExportKeyword	
+✓	AssertClause	
+✓	AssertEntry	
+✓	NamedImports	
+✓	NamedExports	
 —		
+129	AssertKeyword	
 000	Unknown	
 002	SingleLineCommentTrivia	
 003	MultiLineCommentTrivia	
@@ -279,9 +284,7 @@
 246	ModuleBlock	
 247	CaseBlock	
 252	NamespaceImport	
-253	NamedImports	
 254	ImportSpecifier	
-257	NamedExports	
 258	ExportSpecifier	
 259	MissingDeclaration	
 260	ExternalModuleReference	

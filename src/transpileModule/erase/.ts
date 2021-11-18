@@ -50,6 +50,24 @@ function * erase (this :void, node :util.Node) :Generator<string, void, void> {
 	if ( node.modifiers ) { for ( const modifier of node.modifiers ) { if ( modifier.kind===deps.DeclareKeyword ) { return yield util.eraseRange(node); } } }
 	node.decorators && util.throwPosError(util.RealPos(node.decorators), `@ltd/j-ts can not handle decorator`);
 	switch ( node.kind ) {
+		case deps.NamedImports:
+		case deps.NamedExports:
+			const { elements } = node as deps.NamedImports | deps.NamedExports;
+			let ts_index = node.pos;
+			let isTypeOnly = false;
+			for ( const element of elements ) {
+				yield isTypeOnly
+					? util.eraseBetween(ts_index, element.pos)
+					: util.slice(ts_index, element.pos);
+				( isTypeOnly = element.isTypeOnly )
+					? yield util.eraseRange(element)
+					: yield * util.erase(element);
+				ts_index = element.end;
+			}
+			yield isTypeOnly
+				? util.eraseBetween(ts_index, ts_index = elements.end) + util.slice(ts_index, node.end)
+				: util.slice(ts_index, node.end);
+			return;
 		case deps.ModuleDeclaration:
 			const { name } = node as deps.ModuleDeclaration;
 			throw name

@@ -132,3 +132,11 @@ function * YIELD ( ) {
 	:
 	[
 	] => [];
+
+import { before , type AS , after } from '' ;
+import { type AS , } from '' ;
+import { type AS } from '' ;
+
+export { before , type AS , after } ;
+export { type AS , } ;
+export { type AS } ;
