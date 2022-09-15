@@ -79,6 +79,13 @@ function * erase (this :void, node :util.Node) :Generator<string, void, void> {
 		case deps.NewExpression:
 		case deps.TaggedTemplateExpression:
 			return yield * eraseArgumentType(node);
+		case deps.ExpressionWithTypeArguments: {
+			const { expression } = node as deps.ExpressionWithTypeArguments;
+			if ( node.pos!==expression.pos ) { yield util.slice(node.pos, expression.pos); }
+			yield * util.erase(expression);
+			yield util.eraseBetween(expression.end, node.end);
+			return;
+		}
 		case deps.VariableDeclaration:
 			return yield * eraseVariableType(node as deps.VariableDeclaration);
 		case deps.PropertyDeclaration:

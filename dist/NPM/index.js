@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '10.1.0';
+const version = '10.2.0';
 
 const TypeError$1 = TypeError;
 
@@ -97,7 +97,7 @@ const {
 	NamedExports,
 } = SyntaxKind;
 
-const Error$1 = Error;
+const Error$1 = {if:Error}.if;
 
 let ing$1          = false;
 
@@ -442,6 +442,10 @@ const exec = RegExp.prototype.exec;
 
 const bind = Function.prototype.bind;
 
+const Object$1 = Object;
+
+const freeze = Object.freeze;
+
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 const NULL = (
@@ -452,25 +456,23 @@ const NULL = (
 	/* j-globals: null.prototype (internal) */
 );
 
-var hasOwn = (
-	/* j-globals: Object.hasOwn (polyfill) */
-	Object.hasOwn || /*#__PURE__*/function () {
-		return hasOwnProperty.bind
-			? hasOwnProperty.call.bind(hasOwnProperty)
-			: function hasOwn (object, key) { return hasOwnProperty.call(object, key); };
-	}()
-	/* j-globals: Object.hasOwn (polyfill) */
-);
-
 const create = Object.create;
 
 const toStringTag = typeof Symbol==='undefined' ? undefined$1 : Symbol.toStringTag;
 
 const defineProperty = Object.defineProperty;
 
-const freeze = Object.freeze;
-
 const assign = Object.assign;
+
+var hasOwn = (
+	/* j-globals: Object.hasOwn (polyfill) */
+	Object$1.hasOwn || /*#__PURE__*/function () {
+		return hasOwnProperty.bind
+			? hasOwnProperty.call.bind(hasOwnProperty)
+			: function hasOwn (object, key) { return hasOwnProperty.call(object, key); };
+	}()
+	/* j-globals: Object.hasOwn (polyfill) */
+);
 
 const Default = (
 	/* j-globals: default (internal) */
@@ -1547,6 +1549,13 @@ function * erase$1 (            node           )                                
 		case NewExpression:
 		case TaggedTemplateExpression:
 			return yield * eraseArgumentType(node);
+		case ExpressionWithTypeArguments: {
+			const { expression } = node                                    ;
+			if ( node.pos!==expression.pos ) { yield slice(node.pos, expression.pos); }
+			yield * erase$2(expression);
+			yield eraseBetween(expression.end, node.end);
+			return;
+		}
 		case VariableDeclaration:
 			return yield * eraseVariableType(node                            );
 		case PropertyDeclaration:

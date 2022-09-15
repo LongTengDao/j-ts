@@ -1,25 +1,38 @@
 {
-	"name": "@ltd/j-ts",
-	"description": "Pure transpiler for TypeScript. Belong to \"Plan J\".／TypeScript 纯转译工具。从属于“简计划”。",
-	"version": "10.1.0",
-	"license": "LGPL-3.0",
-	"author": "龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)",
-	"bugs": "https://GitHub.com/LongTengDao/j-ts/issues",
+	"name": "@ltd/j-ts"
+	,
+	"version": "10.2.0"
+	,
+	"license": "LGPL-3.0"
+	,
+	"author": "龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)"
+	,
+	"bugs": "https://GitHub.com/LongTengDao/j-ts/issues"
+	,
 	"repository": {
-		"type": "git",
+		"type": "git"
+		,
 		"url": "https://GitHub.com/LongTengDao/j-ts.git"
-	},
+	}
+	,
+	"description": "Pure transpiler for TypeScript. Belong to \"Plan J\".／TypeScript 纯转译工具。从属于“简计划”。"
+	,
 	"keywords": [
-		"TypeScript",
-		"TS",
+		"TypeScript"
+		,
+		"TS"
+		,
 		"TSX"
-	],
+	]
+	,
 	"dependencies": {
-		"typescript": "4.5.2"
-	},
+		"typescript": "4.8.3"
+	}
+	,
 	"exports": {
 		"require": {
-			"types": "./index.d.ts",
+			"types": "./index.d.ts"
+			,
 			"default": "./index.js"
 		}
 	}

@@ -93,7 +93,7 @@ Array ?. < 1 > ( < 1 > 1 ) ;
 
 try { } catch ( e : unknown ) { }
 
-class X extends ( Array ) < 1 > { }
+class X extends ( Map ) < 1 , 2 > { }
 
 ( <T> (t :any) => {} ) <1> ``;
 
@@ -140,3 +140,5 @@ import { type AS } from '' ;
 export { before , type AS , after } ;
 export { type AS , } ;
 export { type AS } ;
+
+const MyMap = Map < 1 , 2 > ;

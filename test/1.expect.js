@@ -93,7 +93,7 @@ Array ?.       (       1 ) ;
 
 try { } catch ( e           ) { }
 
-class X extends ( Array )       { }
+class X extends ( Map )           { }
 
 (     (t     ) => {} )     ``;
 
@@ -140,3 +140,5 @@ import {         } from '' ;
 export { before ,           after } ;
 export {           } ;
 export {         } ;
+
+const MyMap = Map           ;

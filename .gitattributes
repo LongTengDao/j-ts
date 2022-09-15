@@ -1,2 +1,2 @@
-/LICENSE\ * linguist-vendored=true
-/dist/** linguist-vendored=false
+/LICENSE\ * linguist-detectable=false
+/dist/** linguist-detectable=true
